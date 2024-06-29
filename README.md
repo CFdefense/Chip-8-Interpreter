@@ -12,3 +12,5 @@ This software draws inspiration and is an adaptation of works created by **Prof.
 - Tania Rascia Walkthrough: [taniaRascia.com](https://www.taniarascia.com/writing-an-emulator-in-javascript-chip8/#memory)
 - Cowgod's Chip-8 reference: [Cowgod](http://devernay.free.fr/hacks/chip8/C8TECH10.HTM#2.2)
 - Austin Morlans building a Chip-8 emulator: [Austin Morlan](https://austinmorlan.com/posts/chip8_emulator/)
+
+For testing https://github.com/Timendus/chip8-test-suite?tab=readme-ov-file#chip-8-splash-screen
