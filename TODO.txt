@@ -1,0 +1,3 @@
+Read in ROM
+create memory -> see wiki reference for registers and stuff
+cpu
