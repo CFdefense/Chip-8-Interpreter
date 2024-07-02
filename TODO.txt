@@ -1,3 +1,8 @@
 Read in ROM
 create memory -> see wiki reference for registers and stuff
 cpu
+
+
+other info
+
+local web server with python -- python3 - m http.server -- should we do this?
