@@ -10,7 +10,12 @@ class System():
     # chip-8 system constructor
     def __init__(self):
         self._memory = Memory()
+        # add more component initilization below
 
     # starts the entire system
     def startSystem(self):
-        print("Done!")
+        print("System Successfully Started!")
+
+    # calls load function memory
+    def loadROM(self, fileName):
+        self._memory.loadProgramIntoMemory(fileName)

@@ -5,4 +5,10 @@ cpu
 
 other info
 
-local web server with python -- python3 - m http.server -- should we do this?
+local web server with python -- python3 - m http.server -- should we do this? -> Not bad idea will look into
+
+Rom Reading ISSUE Documentation
+By storing hexidecimal in bytearray we are converting the hexidecimal into ascii
+IE we need to read 0xE0 as string becomes 69+48 etc -> not usable in future
+I have went ahead and followed your lead by doing this, however, I believe
+we should change the array type to string/some other and store hexidecimal

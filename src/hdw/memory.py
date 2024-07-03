@@ -1,5 +1,7 @@
 # memory.py
 # the chip-8's memory
+#IMPORTANT CONTEXT -> 0x000 to 0x1FF (0 to 511) Reserved for Interpreter,
+# 0x200 (512) and above for storing ROMS
 
 # imports here ---
 
@@ -41,14 +43,28 @@ class Memory():
             self.generalMemory[i] = self.sprites[i]
 
     # load a program into general memory
-    def loadProgramIntoMemory(self):
-        pass
+    def loadProgramIntoMemory(self, fileName):
+        startingMem = 512 # Memory Address to st
+        #open file and read it in as binary
+        with open(fileName, 'rb') as romFile:
+            # Read in the file contents and convert to hexidecimal
+            romContents = romFile.read().hex()
 
-
+            #Check if the loaded ROM is too big
+            if(len(romContents) > len(self.generalMemory) - startingMem):
+                print("ROM Exceeded Remaining Memory Space")
+            else:
+            # Load ROM into General memory after 0x200 (512)
+                for i in range(0, len(romContents), 2):
+                    reFormat = "0x" + romContents[i:i+2] # get every two to form byte and add 0x
+                    final = int(reFormat, 16) # converts to int for storing
+                    self.generalMemory[startingMem + i] = final # add to general memory after 512
+            
     # dumps the memory from one location to another
     def dumpMemory(self, start, end):
         print("Dumping Memory...")
         for i in range(start, end):
             print(self.generalMemory[i])
+
 
     
