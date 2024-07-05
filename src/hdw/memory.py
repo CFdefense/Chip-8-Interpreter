@@ -10,10 +10,10 @@ class Memory():
 
     # chip-8 memory constructor
     def __init__(self):
+        print("Memory was created successfully...")
         self.generalMemory = bytearray(4096) # general memory 4096 bytes (4kb)
         self.initSprites()  # call function to init sprites array
         self.loadSprites()  # call function to load all of the sprites into memory
-        self.dumpMemory(0, 80)
     
     # load sprites into sprite array
     def initSprites(self):
@@ -44,25 +44,25 @@ class Memory():
 
     # load a program into general memory
     def loadProgramIntoMemory(self, fileName):
-        startingMem = 512 # Memory Address to st
-        #open file and read it in as binary
-        with open(fileName, 'rb') as romFile:
-            # Read in the file contents and convert to hexidecimal
-            romContents = romFile.read().hex()
+        startingMem = 0x200 # chip-8 programs start at 0x200
 
-            #Check if the loaded ROM is too big
+        # open file and read in the content
+        with open(fileName, 'rb') as romFile:
+            romContents = romFile.read()
+
+            # check if the loaded ROM is too big
             if(len(romContents) > len(self.generalMemory) - startingMem):
                 print("ROM Exceeded Remaining Memory Space")
             else:
-            # Load ROM into General memory after 0x200 (512)
-                for i in range(0, len(romContents), 2):
-                    reFormat = "0x" + romContents[i:i+2] # get every two to form byte and add 0x
-                    final = int(reFormat, 16) # converts to int for storing
-                    self.generalMemory[startingMem + i] = final # add to general memory after 512
+                # load ROM into General memory after 0x200 (512)
+                for i, final in enumerate(romContents):
+                    self.generalMemory[startingMem + i] = final
             
     # dumps the memory from one location to another
     def dumpMemory(self, start, end):
         print("Dumping Memory...")
+        
+        # dump mem
         for i in range(start, end):
             print(self.generalMemory[i])
 

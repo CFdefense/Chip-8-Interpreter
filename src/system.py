@@ -14,8 +14,9 @@ class System():
 
     # starts the entire system
     def startSystem(self):
-        print("System Successfully Started!")
+        print("System started successfully...")
 
     # calls load function memory
     def loadROM(self, fileName):
         self._memory.loadProgramIntoMemory(fileName)
+        self._memory.dumpMemory(0, 800)

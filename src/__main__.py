@@ -10,9 +10,12 @@ def main():
     _system.startSystem() # after building the system -- call start system
 
     # get file name and call down to memory to attempt to load it
-    fileName = input("Enter ROM File Path")
-    print(fileName)
-    _system.loadROM(fileName)
+    try:
+        fileName = input("Enter ROM file path: ")
+        print(fileName)
+        _system.loadROM(fileName)
+    except:
+        print("There was an issue when attempting to load in the ROM...")
 
 if __name__ == "__main__":
     main()
