@@ -6,19 +6,3 @@ cpu
 other info
 
 local web server with python -- python3 - m http.server -- should we do this? -> Not bad idea will look into
-
-Rom Reading ISSUE Documentation
-By storing hexidecimal in bytearray we are converting the hexidecimal into ascii    -- its not ascii, its simply int/decimal
-IE we need to read 0xE0 as string becomes 69+48 etc -> not usable in future -- this is incorrect. E0 is stored as 224 because hex to int conversion
-I have went ahead and followed your lead by doing this, however, I believe
-we should change the array type to string/some other and store hexidecimal
-
-
-
-- We need to discuss more before we move on because we seem to not be on the same page
-- Also there seems to be some confusion
-- We need to discuss and study before moving on
-- the byte array is storing the values as integers not ascii. Its simply doing a hex to integer conversion.
-- If we need to output hex or do hex calculations simply take the int at an index and use .hex()
-
-- Lets schedule a talk to go over this
