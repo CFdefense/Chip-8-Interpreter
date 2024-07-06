@@ -17,6 +17,8 @@ def main():
     except:
         print("There was an issue when attempting to load in the ROM...")
 
+    _system.cycle(True) # start the cpu cycle
+
 if __name__ == "__main__":
     main()
 
