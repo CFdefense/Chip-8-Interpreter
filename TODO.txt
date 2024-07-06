@@ -1,5 +1,5 @@
  - cpu build
-    - big endian byte combination
+    - big endian byte combination -- done
     - fetch, decode, execute
     - structure of switch cases and subroutines
 

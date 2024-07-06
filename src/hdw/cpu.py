@@ -21,6 +21,9 @@ class Cpu():
         self.opCode = 0 # the current op code
         self.instruction = 0    # the current instruction
 
+    # cpu cycle
+    def cycle(self, status):
+        self.step()
 
     # combine the bytes from memory in big endian format
     def combineBytes(self, LOB, HOB):
@@ -28,12 +31,12 @@ class Cpu():
 
     # step through each instruction
     def step(self):
-        self.opCode = self.fetch()
+        self.opCode = self.fetch()  # call fetch
         self.programCounter += 2
-        self.instruction = self.decode()
-        self.execute()
+        self.instruction = self.decode()    # call decode
+        self.execute()  # call execute
 
-    # fetches instruction from memory
+    # fetches the HOB and LOB from memory
     def fetch(self):
         return self.combineBytes(self._memory.generalMemory[self.programCounter], self._memory.generalMemory[self.programCounter + 1])
 

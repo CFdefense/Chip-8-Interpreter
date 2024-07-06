@@ -17,10 +17,18 @@ class System():
     def startSystem(self):
         print("System started successfully...")
 
-    # calls load function memory
+        # get the ROM from the user and call memory to load it in
+        try:
+            fileName = input("Enter ROM file path: ")
+            print(fileName)
+            self.loadROM(fileName)
+        # output if there is an error
+        except:
+            print("There was an issue when attempting to load in the ROM...")
+
+        self._cpu.cycle(True) # start the cpu cycle
+
+    # calls memory and passes it the name of the ROM to load in
     def loadROM(self, fileName):
         self._memory.loadProgramIntoMemory(fileName)
         # uncomment to dump memory -- self._memory.dumpMemory(0, 800)
-    
-    def cycle(self, status):
-        self._cpu.step()
