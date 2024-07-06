@@ -1,8 +1,13 @@
-Read in ROM
-create memory -> see wiki reference for registers and stuff
-cpu
+ - cpu build
+    - big endian byte combination
+    - fetch, decode, execute
+    - structure of switch cases and subroutines
 
 
-other info
+
+
+
+
 
 local web server with python -- python3 - m http.server -- should we do this? -> Not bad idea will look into
+
