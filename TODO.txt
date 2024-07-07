@@ -1,7 +1,7 @@
  - cpu build
     - big endian byte combination -- done
-    - fetch, decode, execute
-    - structure of switch cases and subroutines
+    - fetch, decode, execute -- done but could be edited a bit ie do we remove instruction? or use for console outputs?
+    - structure of switch cases and subroutines -- done
 
 
 
