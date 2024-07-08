@@ -222,74 +222,98 @@ class Cpu():
 
         self.registers[Vx] = self.registers[Vy]
 
+    # set the register Vx = Vx OR Vy
     def setRegisterVx_8xy1(self):
         print("test...")
 
+    # set the register Vx = Vx AND Vy
     def setRegisterVx_8xy2(self):
         print("test...")
 
+    # set the register Vx = Vx XOR Vy
     def setRegisterVx_8xy3(self):
         print("test...")
 
+    # set the register Vx = Vx + Vy, and set VF = carry
     def setRegisterVx_8xy4(self):
         print("test...")
 
+    # set the register Vx = Vx - Vy, and set VF = NOT borrow
     def setRegisterVx_8xy5(self):
         print("test...")
 
+    # set the register Vx = Vx SHR 1
     def setRegisterVx_8xy6(self):
         print("test...")
 
+    # set the register Vx = Vy - Vx, and set VF = NOT borrow
     def setRegisterVx_8xy7(self):
         print("test...")
 
+    # set the register Vx = Vx SHL 1
     def setRegisterVx_8xyE(self):
         print("test...")
 
+    # skip the next instruction if Vx != Vy
     def skipNextInstruction_9xy0(self):
         print("test...")
 
+    # set the register I = nnn
     def setRegisterI_Annn(self):
         print("test...")
 
+    # jump to location nnn + V0
     def jump2Location_Bnnn(self):
         print("test...")
 
+    # set the register Vx = random byte AND kk.
     def setRegisterVx_Cxkk(self):
         print("test...")
 
+    # display sprite starting at memory location I
     def displaySprite_Dxyn(self):
         print("test...")
 
+    # skip the next instruction if a key with the value of Vx is pressed
     def skipNextInstruction_Ex9E(self):
         print("test...")
 
+    # skip the next instruction if a key with the value of Vx is not pressed
     def skipNextInstruction_ExA1(self):
         print("test...")
 
+    # set the register Vx = delay timer
     def setRegisterVx_Fx07(self):
         print("test...")
 
+    # wait for a key press and store the value of the key in the register Vx
     def waitForKeyPress_Fx0A(self):
         print("test...")
 
+    # set the delay timer = Vx
     def setDelayTimer_Fx15(self):
         print("test...")
 
+    # set the sound timer = Vx
     def setSoundTimer_Fx18(self):
         print("test...")
 
+    # set the register I = I + Vx
     def setRegisterI_Fx1E(self):
         print("test...")
 
+    # set the register I = location of a sprite for digit Vx
     def setRegisterI_Fx29(self):
         print("test...")
 
+    # store a BCD representation of Vx in memory
     def storeBCDRepresentationInMemory_Fx33(self):
         print("test...")
 
+    # store registers in memory
     def storeRegistersInMemory_Fx55(self):
         print("test...")
 
+    # read registers from memory
     def readRegisters_Fx65(self):
         print("test...")
