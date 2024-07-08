@@ -17,22 +17,38 @@ class Cpu():
         self.stackPointer = 0x52   #  8-bit int that points to location within the stack
         self.indexRegister = 0  # 16-bit memory address pointer
         self.delayTimer = 0 # this timer does nothing more than subtract 1 from the value of DT at a rate of 60Hz
-        self.soundTimer = 0 # this timer also decrements at a rate of 60Hz, however, as long as ST's value is greater than zero, the Chip-8 buzzer will sound
+        self.timerHalted = False # determines if the delay timer is active
+        self.soundTimer = 0 # this timer also decrements at a rate of 60Hz
         self.opCode = 0 # the current op code
         self.instruction = 0    # the current instruction
 
     # cpu cycle
-    def cycle(self, status):
-        # Some timer function has to be implemented here in the future to control how often step is called
-            if(status == True):
-                self.step()
+    def cycle(self):
+        self.step() # step through each instruction
+
+        # decrement the delay timer by 1 until it is 0
+        if(self.delayTimer > 0):
+            self.delayTimer -= 1
+        else:
+            self.timerHalted = True
+
+        # decrement the sound timer by 1 while its greater than 0
+        if(self.soundTimer > 0):
+            self.soundTimer -= 1
+        else:
+            # diasble the sound timer     
+            print("Not implemented yet")
+
+    # increments the program counter by 2 for the next instruction
+    def incrementPC(self):
+        self.programCounter += 2    # increment after execute
         
     # step through each instruction
     def step(self):
         self.opCode = self.fetch()  # call fetch
+        self.incrementPC()  # increment the program counter
         self.instruction = self.decode()    # call decode
         self.execute()  # call execute
-        self.programCounter += 2    # increment after execute
 
     # fetches the HOB and LOB from memory
     def fetch(self):
@@ -51,45 +67,45 @@ class Cpu():
         print(self.instruction, end= " ")
         # built in switch cases do not exist use if-else
 
-        # Determine Instruction to Execute
+        # determine the instruction to execute
         if(self.opCode & 0xF000 == 0x0000):
             if(self.opCode == 0x00E0):
-                self.iClearScreen()
+                self.clearScreen()
             elif(self.opCode == 0x00EE):
-                self.iReturnSub()
+                self.returnSub()
             else:
-                self.iSysAddr()
+                self.jump2MachineCodeRoutine()
         elif(self.opCode & 0xF000 == 0x1000):
-            self.iJpnAddr()
+            self.jumpAddr()
         elif(self.opCode & 0xF000 == 0x2000):
-            self.iCallAddr()
+            self.callAddr()
         elif(self.opCode & 0xF000 == 0x3000):
-            self.iSeBySkip()
+            self.skipNextInstruction3xkk()
         elif(self.opCode & 0xF000 == 0x4000):
-            self.iSneSkip()
+            self.skipNextInstruction4xkk()
         elif(self.opCode & 0xF000 == 0x5000):
-            self.iSeVySkip()
+            self.skipNextInstruction5xy0()
         elif(self.opCode & 0xF000 == 0x6000):
-            self.iSetVxBy()
+            self.setRegisterVx6xkk()
         elif(self.opCode & 0xF000 == 0x7000):
-            self.iAddVxBy()
+            self.setRegisterVx7xkk()
         elif(self.opCode & 0xF000 == 0x8000):
             if(self.opCode & 0x000F == 0x0000):
-                self.iSetVxVy()
+                self.setRegisterVx8xy0()
             elif(self.opCode & 0x000F == 0x0001):
-                self.iSetVxOVy()
+                self.setRegisterVx8xy1()
             elif(self.opCode & 0x000F == 0x0002):
-                self.iSetVxAVy()
+                self.setRegisterVx8xy2()
             elif(self.opCode & 0x000F == 0x0003):
-                self.iSetVxXVy()
+                self.setRegisterVx8xy3()
             elif(self.opCode & 0x000F == 0x0004):
-                self.iSetVxAVy()
+                self.setRegisterVx8xy4()
             elif(self.opCode & 0x000F == 0x0005):
-                self.iSetVxSVy()
+                self.setRegisterVx8xy5()
             elif(self.opCode & 0x000F == 0x0006):
-                self.iSHRVxVy()
+                self.setRegisterVx8xy6()
             elif(self.opCode & 0x000F == 0x0007):
-                self.iSetVySVx()
+                self.setRegisterVx8xy7()
             elif(self.opCode & 0x000F == 0x000E):
                 self.iSHLVxVy()
         elif(self.opCode & 0xF000 == 0x9000):
@@ -128,105 +144,152 @@ class Cpu():
                 elif(self.opCode & 0x00F0 == 0x0060):
                     self.iReadV0Vx()
             
+    # clear the display -- CLS/00E0
+    def clearScreen_00E0(self):
+        print("implement clear screen")
 
-    def iClearScreen(self):
-        print("Running iClearScreen...")
+    # return from a subroutine -- RET/00EE
+    def returnSub_00EE(self):
+        # decrement the stack pointer and reset the program counter
+        self.stackPointer -= 1
+        self.programCounter = self.stack[self.stackPointer]
 
-    def iReturnSub(self):
-        print("Running iReturnSub...")
+    # do we need this???
+    # jumps to a machine code routine at address nnn
+    def jump2MachineCodeRoutine_0nnn(self):
+        print("Necessary?")
 
-    def iSysAddr(self):
-        print("Running iSysAddr...")
+    # jump to address nnn -- JP addr/1nnn
+    def jumpAddr_1nnn(self):
+        address = self.opCode & 0x0FFF  # extract lower 12 bits
+        self.programCounter = address   # set program counter to the address
 
-    def iJpnAddr(self):
-        print("Running iJpnAddr...")
+    # call a subroutine at nnn -- CALL addr/2nnn
+    def callAddr_2nnn(self):
+        address = self.opCode & 0x0FFF  # extract lower 12 bits
+        self.stackPointer += 1
+        self.stack[self.stackPointer] = self.programCounter
+        self.programCounter = address
 
-    def iCallAddr(self):
-        print("Running iCallAddr...")
+    # skip the next instruction if Vx == kk
+    def skipNextInstruction_3xkk(self):
+        # compare register Vx to kk
+        Vx = (self.opCode + 0x0FFF) >> 8    # shift bits
+        kk = self.opCode + 0x0FFF    # grab last byte by masking
 
-    def iSeBySkip(self):
-        print("Running iSeBySkip...")
+        if(self.registers[Vx] == kk):
+            self.incrementPC()
 
-    def iSneSkip(self):
-        print("Running iSneSkip...")
+    # skip the next instruction if Vx != kk
+    def skipNextInstruction_4xkk(self):
+        # compare register Vx to kk
+        Vx = (self.opCode + 0x0FFF) >> 8    # shift bits
+        kk = self.opCode + 0x0FFF    # grab last byte by masking
 
-    def iSeVySkip(self):
-        print("Running iSeVySkip...")
+        if(self.registers[Vx] != kk):
+            self.incrementPC()
 
-    def iSetVxBy(self):
-        print("Running iSetVxBy...")
+    # skip the next instruction if Vx == Vy
+    def skipNextInstruction_5xy0(self):
+        # compare registers Vx and Vy
+        Vx = (self.opCode + 0x0FFF) >> 8    # shift bits
+        Vy = (self.opCode + 0x0FFF) >> 4     # shift bits
 
-    def iAddVxBy(self):
-        print("Running iAddVxBy...")
+        if(self.registers[Vx] == self.registers[Vy]):
+            self.incrementPC()
 
-    def iSetVxVy(self):
-        print("Running iSetVxVy...")
+    # set the register Vx = kk
+    def setRegisterVx_6xkk(self):
+        # set register Vx to kk
+        Vx = (self.opCode + 0x0FFF) >> 8    # shift bits
+        kk = self.opCode + 0x0FFF    # grab last byte by masking
 
-    def iSetVxOVy(self):
-        print("Running iSetVxOVy...")
+        self.registers[Vx] = kk
 
-    def iSetVxXVy(self):
-        print("Running iSetVxXVy...")
+    # set the register Vx = Vx + kk
+    def setRegisterVx_7xkk(self):
+        # set register Vx to Vx + kk
+        Vx = (self.opCode + 0x0FFF) >> 8    # shift bits
+        kk = self.opCode + 0x0FFF    # grab last byte by masking
 
-    def iSetVxAVy(self):
-        print("Running iSetVxAVy...")
+        self.registers[Vx] += kk
 
-    def iSetVxSVy(self):
-        print("Running iSetVxSVy...")
+    # set the register Vx = Vy
+    def setRegisterVx_8xy0(self):
+        # set register Vx = Vy
+        Vx = (self.opCode + 0x0FFF) >> 8    # shift bits
+        Vy = (self.opCode + 0x0FFF) >> 4     # shift bits
 
-    def iSHRVxVy(self):
-        print("Running iSHRVxVy...")
+        self.registers[Vx] = self.registers[Vy]
 
-    def iSetVySVx(self):
-        print("Running iSetVySVx...")
+    def setRegisterVx_8xy1(self):
+        print("test...")
 
-    def iSHLVxVy(self):
-        print("Running iSHLVxVy...")
+    def setRegisterVx_8xy2(self):
+        print("test...")
 
-    def iSNEVxVy(self):
-        print("Running iSNEVxVy...")
+    def setRegisterVx_8xy3(self):
+        print("test...")
 
-    def iLDIndex(self):
-        print("Running iLDIndex...")
+    def setRegisterVx_8xy4(self):
+        print("test...")
 
-    def iJpVAddr(self):
-        print("Running iJpVAddr...")
+    def setRegisterVx_8xy5(self):
+        print("test...")
 
-    def iSetVxRand(self):
-        print("Running iSetVxRand...")
+    def setRegisterVx_8xy6(self):
+        print("test...")
 
-    def iDisplayBy(self):
-        print("Running iDisplayBy...")
+    def setRegisterVx_8xy7(self):
+        print("test...")
 
-    def iSkipVxIs(self):
-        print("Running iSkipVxIs...")
+    def setRegisterVx_8xyE(self):
+        print("test...")
 
-    def iSkipVxIsN(self):
-        print("Running iSkipVxIsN...")
+    def skipNextInstruction_9xy0(self):
+        print("test...")
 
-    def iSetVxDT(self):
-        print("Running iSetVxDT...")
+    def setRegisterI_Annn(self):
+        print("test...")
 
-    def iWaitKey(self):
-        print("Running iWaitKey...")
+    def jump2Location_Bnnn(self):
+        print("test...")
 
-    def iSetDelay(self):
-        print("Running iSetDelay...")
+    def setRegisterVx_Cxkk(self):
+        print("test...")
 
-    def iSetSound(self):
-        print("Running iSetSound...")
+    def displaySprite_Dxyn(self):
+        print("test...")
 
-    def iSetVxI(self):
-        print("Running iSetVxI...")
+    def skipNextInstruction_Ex9E(self):
+        print("test...")
 
-    def iSetISprite(self):
-        print("Running iSetISprite...")
+    def skipNextInstruction_ExA1(self):
+        print("test...")
 
-    def iStoreBCD(self):
-        print("Running iStoreBCD...")
+    def setRegisterVx_Fx07(self):
+        print("test...")
 
-    def iStoreV0Vx(self):
-        print("Running iStoreV0Vx...")
+    def waitForKeyPress_Fx0A(self):
+        print("test...")
 
-    def iReadV0Vx(self):
-        print("Running iReadV0Vx...")
+    def setDelayTimer_Fx15(self):
+        print("test...")
+
+    def setSoundTimer_Fx18(self):
+        print("test...")
+
+    def setRegisterI_Fx1E(self):
+        print("test...")
+
+    def setRegisterI_Fx29(self):
+        print("test...")
+
+    def storeBCDRepresentationInMemory_Fx33(self):
+        print("test...")
+
+    def storeRegistersInMemory_Fx55(self):
+        print("test...")
+
+    def readRegisters_Fx65(self):
+        print("test...")

@@ -25,8 +25,12 @@ class System():
         # output if there is an error
         except:
             print("There was an issue when attempting to load in the ROM...")
-
-        self._cpu.cycle(True) # start the cpu cycle
+        
+        # some type of while loop to continuously call cycle
+        while not (self._cpu.timerHalted):
+            self._cpu.cycle() # start the cpu cycle
+            
+        print("The System is powering down...")
 
     # calls memory and passes it the name of the ROM to load in
     def loadROM(self, fileName):
