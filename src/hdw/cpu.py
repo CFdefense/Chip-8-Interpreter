@@ -70,79 +70,79 @@ class Cpu():
         # determine the instruction to execute
         if(self.opCode & 0xF000 == 0x0000):
             if(self.opCode == 0x00E0):
-                self.clearScreen()
+                self.clearScreen_00E0()
             elif(self.opCode == 0x00EE):
-                self.returnSub()
+                self.returnSub_00EE()
             else:
-                self.jump2MachineCodeRoutine()
+                self.jump2MachineCodeRoutine_0nnn()
         elif(self.opCode & 0xF000 == 0x1000):
-            self.jumpAddr()
+            self.jumpAddr_1nnn()
         elif(self.opCode & 0xF000 == 0x2000):
-            self.callAddr()
+            self.callAddr_2nnn()
         elif(self.opCode & 0xF000 == 0x3000):
-            self.skipNextInstruction3xkk()
+            self.skipNextInstruction_3xkk()
         elif(self.opCode & 0xF000 == 0x4000):
-            self.skipNextInstruction4xkk()
+            self.skipNextInstruction_4xkk()
         elif(self.opCode & 0xF000 == 0x5000):
-            self.skipNextInstruction5xy0()
+            self.skipNextInstruction_5xy0()
         elif(self.opCode & 0xF000 == 0x6000):
-            self.setRegisterVx6xkk()
+            self.setRegisterVx_6xkk()
         elif(self.opCode & 0xF000 == 0x7000):
-            self.setRegisterVx7xkk()
+            self.setRegisterVx_7xkk()
         elif(self.opCode & 0xF000 == 0x8000):
             if(self.opCode & 0x000F == 0x0000):
-                self.setRegisterVx8xy0()
+                self.setRegisterVx_8xy0()
             elif(self.opCode & 0x000F == 0x0001):
-                self.setRegisterVx8xy1()
+                self.setRegisterVx_8xy1()
             elif(self.opCode & 0x000F == 0x0002):
-                self.setRegisterVx8xy2()
+                self.setRegisterVx_8xy2()
             elif(self.opCode & 0x000F == 0x0003):
-                self.setRegisterVx8xy3()
+                self.setRegisterVx_8xy3()
             elif(self.opCode & 0x000F == 0x0004):
-                self.setRegisterVx8xy4()
+                self.setRegisterVx_8xy4()
             elif(self.opCode & 0x000F == 0x0005):
-                self.setRegisterVx8xy5()
+                self.setRegisterVx_8xy5()
             elif(self.opCode & 0x000F == 0x0006):
-                self.setRegisterVx8xy6()
+                self.setRegisterVx_8xy6()
             elif(self.opCode & 0x000F == 0x0007):
-                self.setRegisterVx8xy7()
+                self.setRegisterVx_8xy7()
             elif(self.opCode & 0x000F == 0x000E):
-                self.iSHLVxVy()
+                self.setRegisterVx_8xyE()
         elif(self.opCode & 0xF000 == 0x9000):
-            self.iSNEVxVy()
+            self.skipNextInstruction_9xy0()
         elif(self.opCode & 0xF000 == 0xA000):
-            self.iLDIndex()
+            self.setRegisterI_Annn()
         elif(self.opCode & 0xF000 == 0xB000):
-            self.iJpVAddr()
+            self.jump2Location_Bnnn()
         elif(self.opCode & 0xF000 == 0xC000):
-            self.iSetVxRand()
+            self.setRegisterVx_Cxkk()
         elif(self.opCode & 0xF000 == 0xD000):
-            self.iDisplayBy()
+            self.displaySprite_Dxyn()
         elif(self.opCode & 0xF000 == 0xE000):
             if(self.opCode & 0x000F == 0x000E):
-                self.iSkipVxIs()
+                self.skipNextInstruction_Ex9E()
             elif(self.opCode & 0x000F == 0x0001):
-                self.iSkipVxIsN()
+                self.skipNextInstruction_ExA1()
         elif(self.opCode & 0xF000 == 0xF000):
             if(self.opCode & 0x000F == 0x0007):
-                self.iSetVxDT()
+                self.setRegisterVx_Fx07()
             elif(self.opCode & 0x000F == 0x000A):
-                self.iWaitKey()
+                self.waitForKeyPress_Fx0A()
             elif(self.opCode & 0x000F == 0x0008):
-                self.iSetSound()
+                self.setSoundTimer_Fx18()
             elif(self.opCode & 0x000F == 0x000E):
-                self.iSetVxI()
+                self.setRegisterI_Fx1E()
             elif(self.opCode & 0x000F == 0x0009):
-                self.iSetISprite()
+                self.setRegisterI_Fx29()
             elif(self.opCode & 0x000F == 0x0003):
-                self.iStoreBCD()
+                self.storeBCDRepresentationInMemory_Fx33()
             elif(self.opCode & 0x000F == 0x0005):
                 if(self.opCode & 0x00F0 == 0x0010):
-                    self.iSetDelay()
+                    self.setDelayTimer_Fx15()
                 elif(self.opCode & 0x00F0 == 0x0050):
-                    self.iStoreV0Vx()
+                    self.storeRegistersInMemory_Fx55()
                 elif(self.opCode & 0x00F0 == 0x0060):
-                    self.iReadV0Vx()
+                    self.readRegisters_Fx65()
             
     # clear the display -- CLS/00E0
     def clearScreen_00E0(self):
@@ -150,11 +150,11 @@ class Cpu():
 
     # return from a subroutine -- RET/00EE
     def returnSub_00EE(self):
-        # decrement the stack pointer and reset the program counter
-        self.stackPointer -= 1
+        # CHANGED -> cowgod explains we set program counter THEN updates stack pointer
         self.programCounter = self.stack[self.stackPointer]
+        self.stackPointer -= 1
 
-    # do we need this???
+    # required for completeness, wont hurt otherwise may be required for older ROMS
     # jumps to a machine code routine at address nnn
     def jump2MachineCodeRoutine_0nnn(self):
         print("Necessary?")
@@ -174,8 +174,9 @@ class Cpu():
     # skip the next instruction if Vx == kk
     def skipNextInstruction_3xkk(self):
         # compare register Vx to kk
-        Vx = (self.opCode + 0x0FFF) >> 8    # shift bits
-        kk = self.opCode + 0x0FFF    # grab last byte by masking
+        # CHANGE Mask THEN SHIFT 0x3Xkk -> Mask -> 0x0X00 shift 2 byte to become 0x00X or 0xX
+        Vx = (self.opCode & 0x0F00) >> 8    # Extract x nibble -> 0x3'x'kk
+        kk = self.opCode & 0x00FF    # grab last byte by masking -> No need to shift 
 
         if(self.registers[Vx] == kk):
             self.incrementPC()
@@ -183,8 +184,8 @@ class Cpu():
     # skip the next instruction if Vx != kk
     def skipNextInstruction_4xkk(self):
         # compare register Vx to kk
-        Vx = (self.opCode + 0x0FFF) >> 8    # shift bits
-        kk = self.opCode + 0x0FFF    # grab last byte by masking
+        Vx = (self.opCode & 0x0F00) >> 8    # Extract x nibble -> 0x4'x'kk
+        kk = self.opCode & 0x00FF    # grab last byte by masking
 
         if(self.registers[Vx] != kk):
             self.incrementPC()
@@ -192,8 +193,8 @@ class Cpu():
     # skip the next instruction if Vx == Vy
     def skipNextInstruction_5xy0(self):
         # compare registers Vx and Vy
-        Vx = (self.opCode + 0x0FFF) >> 8    # shift bits
-        Vy = (self.opCode + 0x0FFF) >> 4     # shift bits
+        Vx = (self.opCode & 0x0F00) >> 8    # mask x and shift bits
+        Vy = (self.opCode & 0x00F0) >> 4     # mask y and shift bits
 
         if(self.registers[Vx] == self.registers[Vy]):
             self.incrementPC()
@@ -201,119 +202,222 @@ class Cpu():
     # set the register Vx = kk
     def setRegisterVx_6xkk(self):
         # set register Vx to kk
-        Vx = (self.opCode + 0x0FFF) >> 8    # shift bits
-        kk = self.opCode + 0x0FFF    # grab last byte by masking
+        Vx = (self.opCode & 0x0F00) >> 8    # mask x and shift bits
+        kk = self.opCode & 0x00FF    # grab last byte by masking
 
         self.registers[Vx] = kk
 
     # set the register Vx = Vx + kk
     def setRegisterVx_7xkk(self):
         # set register Vx to Vx + kk
-        Vx = (self.opCode + 0x0FFF) >> 8    # shift bits
-        kk = self.opCode + 0x0FFF    # grab last byte by masking
+        Vx = (self.opCode & 0x0F00) >> 8    # mask x and shift bits
+        kk = self.opCode & 0x00FF    # grab last byte by masking
 
         self.registers[Vx] += kk
 
     # set the register Vx = Vy
     def setRegisterVx_8xy0(self):
         # set register Vx = Vy
-        Vx = (self.opCode + 0x0FFF) >> 8    # shift bits
-        Vy = (self.opCode + 0x0FFF) >> 4     # shift bits
+        Vx = (self.opCode & 0x0F00) >> 8    # mask x and shift bits
+        Vy = (self.opCode & 0x00F0) >> 4     # mask y and shift bits
 
         self.registers[Vx] = self.registers[Vy]
 
     # set the register Vx = Vx OR Vy
     def setRegisterVx_8xy1(self):
-        print("test...")
+        Vx = (self.opCode & 0x0F00) >> 8 # mask x and shift bits
+        Vy = (self.opCode & 0x00F0) >> 4 # mask y and shift bits
+
+        # Preform and store OR on Vx and Vy
+        self.registers[Vx] |= self.registers[Vy]
 
     # set the register Vx = Vx AND Vy
     def setRegisterVx_8xy2(self):
-        print("test...")
+        Vx = (self.opCode & 0x0F00) >> 8 # mask x and shift bits
+        Vy = (self.opCode & 0x00F0) >> 4 # mask y and shift bits
+
+        # Preform and store AND on Vx and Vy
+        self.registers[Vx] &= self.registers[Vy]
 
     # set the register Vx = Vx XOR Vy
     def setRegisterVx_8xy3(self):
-        print("test...")
+        Vx = (self.opCode & 0x0F00) >> 8 # mask x and shift bits
+        Vy = (self.opCode & 0x00F0) >> 4 # mask y and shift bits
+
+        # Preform and store XOR on Vx and Vy
+        self.registers[Vx] ^= self.registers[Vy]
 
     # set the register Vx = Vx + Vy, and set VF = carry
     def setRegisterVx_8xy4(self):
-        print("test...")
+        Vx = (self.opCode & 0x0F00) >> 8 # mask x and shift bits
+        Vy = (self.opCode & 0x00F0) >> 4 # mask y and shift bits
+
+        # Check if > 255
+        if(self.registers[Vx] + self.registers[Vy] > 0xFF):
+            self.registers[0xF] = 1 # VF Takes 1
+        else:
+            self.registers[0xF] = 0 # VF Takes 0
+
+        # mask and store lowest byte
+        self.registers[Vx] = (self.registers[Vx] + self.registers[Vy]) & 0xFF
 
     # set the register Vx = Vx - Vy, and set VF = NOT borrow
     def setRegisterVx_8xy5(self):
-        print("test...")
+        Vx = (self.opCode & 0x0F00) >> 8 # mask x and shift bits
+        Vy = (self.opCode & 0x00F0) >> 4 # mask y and shift bits
+
+        if(self.registers[Vx] > self.registers[Vy]):
+            self.registers[0xF] = 1 # VF Takes 1
+        else:
+            self.registers[0xF] = 0 # VF Takes 0
+
+        # Vy subtracted and stored in Vx
+        self.registers[Vx] -= self.registers[Vy]
 
     # set the register Vx = Vx SHR 1
     def setRegisterVx_8xy6(self):
-        print("test...")
+        Vx = (self.opCode & 0x0F00) >> 8 # mask x and shift bits
+
+        # Check if LSB is 1
+        if(self.registers[Vx] & 0x1 == 1):
+            self.registers[0xF] = 1 # VF Set to 1
+        else:
+            self.registers[0xF] = 0 # VF Set to 0
+
+        # Vx shifted right by 1 AKA divided by two
+        self.registers[Vx] >>= 1
 
     # set the register Vx = Vy - Vx, and set VF = NOT borrow
     def setRegisterVx_8xy7(self):
-        print("test...")
+        Vx = (self.opCode & 0x0F00) >> 8 # mask x and shift bits
+        Vy = (self.opCode & 0x00F0) >> 4 # mask y and shift bits
+
+        if(self.registers[Vy] > self.registers[Vx]):
+            self.registers[0xF] = 1 # VF Set to 1
+        else:
+            self.registers[0xF] = 0 # VF Set to 0
+        
+        # Vx subtracted FROM Vy and Stored in Vx
+        self.registers[Vx] = self.registers[Vy] - self.registers[Vx]
 
     # set the register Vx = Vx SHL 1
     def setRegisterVx_8xyE(self):
-        print("test...")
+        Vx = (self.opCode & 0x0F00) >> 8 # mask x and shift bits
+
+        # Check if MSB is 1
+        if(self.registers[Vx] & 0x80 == 1):
+            self.registers[0xF] = 1 # VF Set to 1
+        else:
+            self.registers[0xF] = 0 # VF Set to 0
+
+        # Vx shifted left by 1 AKA multiplied by two
+        self.registers[Vx] <<= 1
 
     # skip the next instruction if Vx != Vy
     def skipNextInstruction_9xy0(self):
-        print("test...")
+        Vx = (self.opCode & 0x0F00) >> 8 # mask x and shift bits
+        Vy = (self.opCode & 0x00F0) >> 4 # mask y and shift bits
+
+        # if they are not equal PC += 2
+        if(self.registers[Vx] != self.registers[Vy]):
+            self.incrementPC()
 
     # set the register I = nnn
     def setRegisterI_Annn(self):
-        print("test...")
+        nnn = (self.opCode & 0x0FFF) # mask last 12 bits
+
+        # nnn Stored in Index Register
+        self.indexRegister = nnn
 
     # jump to location nnn + V0
     def jump2Location_Bnnn(self):
-        print("test...")
+        nnn = (self.opCode & 0x0FFF) # mask last 12 bits
+
+        # PC is set to nnn + V0
+        self.programCounter = nnn + self.registers[0] 
+        
 
     # set the register Vx = random byte AND kk.
     def setRegisterVx_Cxkk(self):
-        print("test...")
+        print("test...") # develop randomizer
 
     # display sprite starting at memory location I
     def displaySprite_Dxyn(self):
-        print("test...")
+        print("Implement Monitor")
 
     # skip the next instruction if a key with the value of Vx is pressed
     def skipNextInstruction_Ex9E(self):
-        print("test...")
+        print("Implement Keyboard")
 
     # skip the next instruction if a key with the value of Vx is not pressed
     def skipNextInstruction_ExA1(self):
-        print("test...")
+        print("Implement Keyboard")
 
     # set the register Vx = delay timer
     def setRegisterVx_Fx07(self):
-        print("test...")
+        Vx = (self.opCode & 0x0F00) >> 8 # Mask x and shift bits
+
+        # Place DT Value into Vx
+        self.register[Vx] = self.delayTimer
 
     # wait for a key press and store the value of the key in the register Vx
     def waitForKeyPress_Fx0A(self):
-        print("test...")
+        print("Implement Keyboard")
 
     # set the delay timer = Vx
     def setDelayTimer_Fx15(self):
-        print("test...")
+        Vx = (self.opCode & 0x0F00) >> 8 # Mask x and shift bits
+
+        # Set timer equal to Vx
+        self.delayTimer = self.registers[Vx]
 
     # set the sound timer = Vx
     def setSoundTimer_Fx18(self):
-        print("test...")
+        Vx = (self.opCode & 0x0F00) >> 8 # Mask x and shift bits
+
+        # Set timer equal to Vx
+        self.soundTimer = self.registers[Vx]
 
     # set the register I = I + Vx
     def setRegisterI_Fx1E(self):
-        print("test...")
+        Vx = (self.opCode & 0x0F00) >> 8 # Mask x and shift bits
+
+        # Set Index to index add Vx
+        self.indexRegister += self.registers[Vx]
 
     # set the register I = location of a sprite for digit Vx
     def setRegisterI_Fx29(self):
-        print("test...")
+        print("Implement some talk to memory sprites")
 
     # store a BCD representation of Vx in memory
     def storeBCDRepresentationInMemory_Fx33(self):
-        print("test...")
+        Vx = (self.opCode & 0x0F00) >> 8  # Mask x and shift bits
+        registerValue = self.registers[Vx]
+
+        # Calculate each decimal place
+        hundredsPlace = registerValue // 100
+        tensPlace = (registerValue // 10) % 10
+        onesPlace = registerValue % 10
+
+        # Store the digits in memory 
+        self._memory.addToMemory(self.indexRegister, hundredsPlace)
+        self._memory.addToMemory(self.indexRegister + 1, tensPlace)
+        self._memory.addToMemory(self.indexRegister + 2, onesPlace)
 
     # store registers in memory
     def storeRegistersInMemory_Fx55(self):
-        print("test...")
+        Vx = (self.opCode & 0x0F00) >> 8  # Mask x and shift bits
+
+        # Iterate through registers V0 to Vx
+        for i in range(self.registers[Vx] + 1):
+            # Store Register Value into Memory Starting at Index Register
+            self.memory.addToMemory(self.indexRegister + i, self.registers[i])
 
     # read registers from memory
     def readRegisters_Fx65(self):
-        print("test...")
+        Vx = (self.opCode & 0x0F00) >> 8  # Mask x and shift bits
+
+        # Iterate through Registers
+        for i in range(self.registers[Vx] + 1):
+            # Add from Memory Starting at Index Register
+            self.registers[i] = self._memory.getFromMemory(self.indexRegister + i)

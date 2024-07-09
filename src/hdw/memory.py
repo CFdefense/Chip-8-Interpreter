@@ -66,5 +66,10 @@ class Memory():
         for i in range(start, end):
             print(self.generalMemory[i])
 
+    # adds a value to a specific spot in the memory
+    def addToMemory(self, location, value):
+        self.generalMemory[location] = value
 
-    
+    # retrieve a value from memory
+    def getFromMemory(self, location):
+        return self.generalMemory[location]
