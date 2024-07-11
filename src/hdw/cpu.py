@@ -36,7 +36,7 @@ class Cpu():
         if(self.soundTimer > 0):
             self.soundTimer -= 1
         else:
-            # diasble the sound timer     
+            # disable the sound timer     
             print("Not implemented yet")
 
     # increments the program counter by 2 for the next instruction
@@ -65,7 +65,6 @@ class Cpu():
     # execute the correct operation based off of the current instruction
     def execute(self):
         print(self.instruction, end= " ")
-        # built in switch cases do not exist use if-else
 
         # determine the instruction to execute
         if(self.opCode & 0xF000 == 0x0000):
@@ -150,14 +149,12 @@ class Cpu():
 
     # return from a subroutine -- RET/00EE
     def returnSub_00EE(self):
-        # CHANGED -> cowgod explains we set program counter THEN updates stack pointer
         self.programCounter = self.stack[self.stackPointer]
         self.stackPointer -= 1
 
-    # required for completeness, wont hurt otherwise may be required for older ROMS
     # jumps to a machine code routine at address nnn
     def jump2MachineCodeRoutine_0nnn(self):
-        print("Necessary?")
+        print("not implemented yet")
 
     # jump to address nnn -- JP addr/1nnn
     def jumpAddr_1nnn(self):
@@ -174,7 +171,6 @@ class Cpu():
     # skip the next instruction if Vx == kk
     def skipNextInstruction_3xkk(self):
         # compare register Vx to kk
-        # CHANGE Mask THEN SHIFT 0x3Xkk -> Mask -> 0x0X00 shift 2 byte to become 0x00X or 0xX
         Vx = (self.opCode & 0x0F00) >> 8    # Extract x nibble -> 0x3'x'kk
         kk = self.opCode & 0x00FF    # grab last byte by masking -> No need to shift 
 
@@ -184,7 +180,7 @@ class Cpu():
     # skip the next instruction if Vx != kk
     def skipNextInstruction_4xkk(self):
         # compare register Vx to kk
-        Vx = (self.opCode & 0x0F00) >> 8    # Extract x nibble -> 0x4'x'kk
+        Vx = (self.opCode & 0x0F00) >> 8    # wxtract x nibble -> 0x4'x'kk
         kk = self.opCode & 0x00FF    # grab last byte by masking
 
         if(self.registers[Vx] != kk):
@@ -228,7 +224,7 @@ class Cpu():
         Vx = (self.opCode & 0x0F00) >> 8 # mask x and shift bits
         Vy = (self.opCode & 0x00F0) >> 4 # mask y and shift bits
 
-        # Preform and store OR on Vx and Vy
+        # perform and store OR on Vx and Vy
         self.registers[Vx] |= self.registers[Vy]
 
     # set the register Vx = Vx AND Vy
@@ -236,7 +232,7 @@ class Cpu():
         Vx = (self.opCode & 0x0F00) >> 8 # mask x and shift bits
         Vy = (self.opCode & 0x00F0) >> 4 # mask y and shift bits
 
-        # Preform and store AND on Vx and Vy
+        # perform and store AND on Vx and Vy
         self.registers[Vx] &= self.registers[Vy]
 
     # set the register Vx = Vx XOR Vy
@@ -244,7 +240,7 @@ class Cpu():
         Vx = (self.opCode & 0x0F00) >> 8 # mask x and shift bits
         Vy = (self.opCode & 0x00F0) >> 4 # mask y and shift bits
 
-        # Preform and store XOR on Vx and Vy
+        # perform and store XOR on Vx and Vy
         self.registers[Vx] ^= self.registers[Vy]
 
     # set the register Vx = Vx + Vy, and set VF = carry
@@ -252,7 +248,7 @@ class Cpu():
         Vx = (self.opCode & 0x0F00) >> 8 # mask x and shift bits
         Vy = (self.opCode & 0x00F0) >> 4 # mask y and shift bits
 
-        # Check if > 255
+        # check if > 255
         if(self.registers[Vx] + self.registers[Vy] > 0xFF):
             self.registers[0xF] = 1 # VF Takes 1
         else:
@@ -278,7 +274,7 @@ class Cpu():
     def setRegisterVx_8xy6(self):
         Vx = (self.opCode & 0x0F00) >> 8 # mask x and shift bits
 
-        # Check if LSB is 1
+        # check if LSB is 1
         if(self.registers[Vx] & 0x1 == 1):
             self.registers[0xF] = 1 # VF Set to 1
         else:
@@ -304,7 +300,7 @@ class Cpu():
     def setRegisterVx_8xyE(self):
         Vx = (self.opCode & 0x0F00) >> 8 # mask x and shift bits
 
-        # Check if MSB is 1
+        # check if MSB is 1
         if(self.registers[Vx] & 0x80 == 1):
             self.registers[0xF] = 1 # VF Set to 1
         else:
@@ -326,7 +322,7 @@ class Cpu():
     def setRegisterI_Annn(self):
         nnn = (self.opCode & 0x0FFF) # mask last 12 bits
 
-        # nnn Stored in Index Register
+        # nnn stored in index register
         self.indexRegister = nnn
 
     # jump to location nnn + V0
@@ -357,7 +353,7 @@ class Cpu():
     def setRegisterVx_Fx07(self):
         Vx = (self.opCode & 0x0F00) >> 8 # Mask x and shift bits
 
-        # Place DT Value into Vx
+        # place DT Value into Vx
         self.register[Vx] = self.delayTimer
 
     # wait for a key press and store the value of the key in the register Vx
@@ -368,21 +364,21 @@ class Cpu():
     def setDelayTimer_Fx15(self):
         Vx = (self.opCode & 0x0F00) >> 8 # Mask x and shift bits
 
-        # Set timer equal to Vx
+        # set timer equal to Vx
         self.delayTimer = self.registers[Vx]
 
     # set the sound timer = Vx
     def setSoundTimer_Fx18(self):
         Vx = (self.opCode & 0x0F00) >> 8 # Mask x and shift bits
 
-        # Set timer equal to Vx
+        # set timer equal to Vx
         self.soundTimer = self.registers[Vx]
 
     # set the register I = I + Vx
     def setRegisterI_Fx1E(self):
         Vx = (self.opCode & 0x0F00) >> 8 # Mask x and shift bits
 
-        # Set Index to index add Vx
+        # set Index to index add Vx
         self.indexRegister += self.registers[Vx]
 
     # set the register I = location of a sprite for digit Vx
@@ -394,12 +390,12 @@ class Cpu():
         Vx = (self.opCode & 0x0F00) >> 8  # Mask x and shift bits
         registerValue = self.registers[Vx]
 
-        # Calculate each decimal place
+        # calculate each decimal place
         hundredsPlace = registerValue // 100
         tensPlace = (registerValue // 10) % 10
         onesPlace = registerValue % 10
 
-        # Store the digits in memory 
+        # store the digits in memory 
         self._memory.addToMemory(self.indexRegister, hundredsPlace)
         self._memory.addToMemory(self.indexRegister + 1, tensPlace)
         self._memory.addToMemory(self.indexRegister + 2, onesPlace)
@@ -408,16 +404,16 @@ class Cpu():
     def storeRegistersInMemory_Fx55(self):
         Vx = (self.opCode & 0x0F00) >> 8  # Mask x and shift bits
 
-        # Iterate through registers V0 to Vx
+        # iterate through registers V0 to Vx
         for i in range(self.registers[Vx] + 1):
-            # Store Register Value into Memory Starting at Index Register
+            # store Register Value into Memory Starting at Index Register
             self.memory.addToMemory(self.indexRegister + i, self.registers[i])
 
     # read registers from memory
     def readRegisters_Fx65(self):
         Vx = (self.opCode & 0x0F00) >> 8  # Mask x and shift bits
 
-        # Iterate through Registers
+        # iterate through Registers
         for i in range(self.registers[Vx] + 1):
             # Add from Memory Starting at Index Register
             self.registers[i] = self._memory.getFromMemory(self.indexRegister + i)

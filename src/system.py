@@ -2,6 +2,7 @@
 # the entire system and the primary file for everything
 
 # imports here -- 
+import time
 from hdw.memory import Memory
 from hdw.cpu import Cpu
 
@@ -12,6 +13,7 @@ class System():
     def __init__(self):
         self._memory = Memory() # the systems memory
         self._cpu = Cpu(self._memory)   # the systems cpu
+        self.cycleDuration = 1 / 60 # calculate 60hz
 
     # starts the entire system
     def startSystem(self):
@@ -26,9 +28,17 @@ class System():
         except:
             print("There was an issue when attempting to load in the ROM...")
         
+        lastCycleTime = time.time() # get the current time
+        
         # some type of while loop to continuously call cycle
         while not (self._cpu.timerHalted):
-            self._cpu.cycle() # start the cpu cycle
+            currentTime = time.time()
+            delayTime = currentTime - lastCycleTime
+
+            # check if enough time has passed between cycles
+            if(delayTime > self.cycleDuration):
+                lastCycleTime = currentTime # update the last cycle
+                self._cpu.cycle() # start the cpu cycle
             
         print("The System is powering down...")
 
