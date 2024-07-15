@@ -17,7 +17,7 @@ class Cpu():
         self.stackPointer = 0x52   #  8-bit int that points to location within the stack
         self.indexRegister = 0  # 16-bit memory address pointer
         self.delayTimer = 0 # this timer does nothing more than subtract 1 from the value of DT at a rate of 60Hz
-        self.timerHalted = False # determines if the delay timer is active
+        # self.timerHalted = False # determines if the delay timer is active
         self.soundTimer = 0 # this timer also decrements at a rate of 60Hz
         self.opCode = 0 # the current op code
         self.instruction = 0    # the current instruction
@@ -29,15 +29,10 @@ class Cpu():
         # decrement the delay timer by 1 until it is 0
         if(self.delayTimer > 0):
             self.delayTimer -= 1
-        else:
-            self.timerHalted = True
 
         # decrement the sound timer by 1 while its greater than 0
         if(self.soundTimer > 0):
             self.soundTimer -= 1
-        else:
-            # disable the sound timer     
-            print("Not implemented yet")
 
     # increments the program counter by 2 for the next instruction
     def incrementPC(self):

@@ -14,6 +14,7 @@ class System():
         self._memory = Memory() # the systems memory
         self._cpu = Cpu(self._memory)   # the systems cpu
         self.cycleDuration = 1 / 60 # calculate 60hz
+        self.systemHalted = False
 
     # starts the entire system
     def startSystem(self):
@@ -31,7 +32,11 @@ class System():
         lastCycleTime = time.time() # get the current time
         
         # some type of while loop to continuously call cycle
-        while not (self._cpu.timerHalted):
+        while not (self.systemHalted):
+            # check if the user halts the system -- this would be through the keyboard
+            if():
+                self.systemHalted = True
+        
             currentTime = time.time()
             delayTime = currentTime - lastCycleTime
 
