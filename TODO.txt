@@ -1,6 +1,6 @@
  - cpu build
     - test instruction
-    - implement main loop
+    - implement main loop -- done just need to add keyboard
 
 
 

@@ -17,7 +17,6 @@ class Cpu():
         self.stackPointer = 0x52   #  8-bit int that points to location within the stack
         self.indexRegister = 0  # 16-bit memory address pointer
         self.delayTimer = 0 # this timer does nothing more than subtract 1 from the value of DT at a rate of 60Hz
-        # self.timerHalted = False # determines if the delay timer is active
         self.soundTimer = 0 # this timer also decrements at a rate of 60Hz
         self.opCode = 0 # the current op code
         self.instruction = 0    # the current instruction
@@ -47,11 +46,13 @@ class Cpu():
 
     # fetches the HOB and LOB from memory
     def fetch(self):
-        return self.combineBytes(self._memory.generalMemory[self.programCounter], self._memory.generalMemory[self.programCounter + 1])
+        lob = self._memory.generalMemory[self.programCounter]
+        hob = self._memory.generalMemory[self.programCounter + 1]
+        return self.combineBytes(lob, hob)
 
     # combine the bytes from memory in big endian format
-    def combineBytes(self, LOB, HOB):
-        return (HOB << 8 | LOB)
+    def combineBytes(self, lob, hob):
+        return (lob << 8) | hob
 
     # opcode -> instruction
     def decode(self):

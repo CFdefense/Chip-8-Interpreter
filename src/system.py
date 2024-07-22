@@ -34,8 +34,8 @@ class System():
         # some type of while loop to continuously call cycle
         while not (self.systemHalted):
             # check if the user halts the system -- this would be through the keyboard
-            if():
-                self.systemHalted = True
+           # if():
+            #   self.systemHalted = True
         
             currentTime = time.time()
             delayTime = currentTime - lastCycleTime
@@ -50,4 +50,4 @@ class System():
     # calls memory and passes it the name of the ROM to load in
     def loadROM(self, fileName):
         self._memory.loadProgramIntoMemory(fileName)
-        # uncomment to dump memory -- self._memory.dumpMemory(0, 800)
+        # uncomment to dump memory -- self._memory.dumpMemory(512, 800)
