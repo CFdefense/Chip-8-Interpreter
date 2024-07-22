@@ -5,6 +5,7 @@
 import time
 from hdw.memory import Memory
 from hdw.cpu import Cpu
+from hdw.keyboard import Keyboard
 
 # system
 class System():
@@ -13,6 +14,7 @@ class System():
     def __init__(self):
         self._memory = Memory() # the systems memory
         self._cpu = Cpu(self._memory)   # the systems cpu
+        self._keyboard = Keyboard()
         self.cycleDuration = 1 / 60 # calculate 60hz
         self.systemHalted = False
 
@@ -34,8 +36,9 @@ class System():
         # some type of while loop to continuously call cycle
         while not (self.systemHalted):
             # check if the user halts the system -- this would be through the keyboard
-           # if():
-            #   self.systemHalted = True
+            # if(self._keyboard):
+                #self.systemHalted = True
+                #break
         
             currentTime = time.time()
             delayTime = currentTime - lastCycleTime
@@ -46,6 +49,7 @@ class System():
                 self._cpu.cycle() # start the cpu cycle
             
         print("The System is powering down...")
+        exit()
 
     # calls memory and passes it the name of the ROM to load in
     def loadROM(self, fileName):
