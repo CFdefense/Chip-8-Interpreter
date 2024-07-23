@@ -64,7 +64,7 @@ class Memory():
         
         # dump mem
         for i in range(start, end):
-            print(self.generalMemory[i])
+            print(hex(self.generalMemory[i]) + " @ " + str(i), end=" ")
 
     # adds a value to a specific spot in the memory
     def addToMemory(self, location, value):

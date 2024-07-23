@@ -6,6 +6,7 @@ import time
 from hdw.memory import Memory
 from hdw.cpu import Cpu
 from hdw.keyboard import Keyboard
+from hdw.monitor import Monitor
 
 # system
 class System():
@@ -13,8 +14,9 @@ class System():
     # chip-8 system constructor
     def __init__(self):
         self._memory = Memory() # the systems memory
-        self._cpu = Cpu(self._memory)   # the systems cpu
-        self._keyboard = Keyboard()
+        self._keyboard = Keyboard() # the systems keyboard 
+        self._monitor = Monitor() # the systems monitor
+        self._cpu = Cpu(self._memory, self._monitor, self._keyboard) # the systems cpu
         self.cycleDuration = 1 / 60 # calculate 60hz
         self.systemHalted = False
 
@@ -47,6 +49,7 @@ class System():
             if(delayTime > self.cycleDuration):
                 lastCycleTime = currentTime # update the last cycle
                 self._cpu.cycle() # start the cpu cycle
+                self._monitor.handleEvents() # to handle window events -> prevents freezing and need to force quit
             
         print("The System is powering down...")
         exit()

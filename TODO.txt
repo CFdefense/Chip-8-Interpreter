@@ -1,6 +1,15 @@
- - cpu build
-    - test instruction
-    - implement main loop -- done just need to add keyboard
+IMPORTANT 
+1. if youre having issues with pygame you need to pip install it (idk how on MAC so prob google)
+however pygame is installed in .venv -> now that I look the .venv folder is not pushing to git so you will probably have to pip install on ur MAC
+2. Test applications on your end such as test 1-3, BC test, both octojams, and test opcode
+3. SPACE_INVADERS Does not seem to want to boot -> many issues could cause this because the program is not built out so dont worry about it so much rn
+
+--TODO--
+1. cpu test (test 4? is this an issue?)
+2. Keyboard build and test (test 6) -> I am unsure how to log keypresses through pygame :?
+3. Sound build and test (test 7)
+
+Let me know what you are able to do so I can continue from there tmrw <3
 
 
 
@@ -8,5 +17,5 @@
 
 
 
-local web server with python -- python3 - m http.server -- should we do this? -> Not bad idea will look into
+local web server with python -- python3 - m http.server -- should we do this? -> will need to abandon pygame if we do this
 

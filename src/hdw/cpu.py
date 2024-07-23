@@ -3,18 +3,23 @@
 
 # imports here --
 from hdw.memory import Memory
+from hdw.monitor import Monitor
+from hdw.keyboard import Keyboard
 
+import random # for use in Cxkk instruction
 # cpu
 class Cpu():
 
     # chip-8 cpu constructor
-    def __init__(self, memory):
+    def __init__(self, memory, monitor, keyboard):
         print("CPU was created successfully...")
         self._memory = memory   # pass in memory so the cpu is aware of it
+        self._monitor = monitor
+        self._keyboard = keyboard
         self.registers = bytearray(16)  # 16 8-bit registers
-        self.stack = bytearray(16)  # keeps track of subroutines and order of execution
+        self.stack = [0] * 16  # keeps track of subroutines and order of execution 16 bit
         self.programCounter = 0x200 # 16-bit program counter -- holds address of next instruction
-        self.stackPointer = 0x52   #  8-bit int that points to location within the stack
+        self.stackPointer = 0   #  8-bit int that points to location within the stack
         self.indexRegister = 0  # 16-bit memory address pointer
         self.delayTimer = 0 # this timer does nothing more than subtract 1 from the value of DT at a rate of 60Hz
         self.soundTimer = 0 # this timer also decrements at a rate of 60Hz
@@ -36,6 +41,20 @@ class Cpu():
     # increments the program counter by 2 for the next instruction
     def incrementPC(self):
         self.programCounter += 2    # increment after execute
+
+    def pushToStack(self, value):
+        if self.stackPointer >= len(self.stack):
+            raise OverflowError("Stack overflow")
+        else:
+            self.stack[self.stackPointer] = value
+            self.stackPointer += 1
+
+    def popFromStack(self):
+        if self.stackPointer == 0:
+            raise IndexError("Stack underflow")
+        else:
+            self.stackPointer -= 1
+            return self.stack[self.stackPointer]
         
     # step through each instruction
     def step(self):
@@ -44,14 +63,14 @@ class Cpu():
         self.instruction = self.decode()    # call decode
         self.execute()  # call execute
 
-    # fetches the HOB and LOB from memory
+    # fetches the HOB and LOB from memory and combines them
     def fetch(self):
-        lob = self._memory.generalMemory[self.programCounter]
-        hob = self._memory.generalMemory[self.programCounter + 1]
-        return self.combineBytes(lob, hob)
-
-    # combine the bytes from memory in big endian format
-    def combineBytes(self, lob, hob):
+        lob = (self._memory.generalMemory[self.programCounter])
+        hob = (self._memory.generalMemory[self.programCounter + 1])
+        return self.combinedHexBytes(hob, lob)
+    
+    # combine the hexidecimals
+    def combinedHexBytes(self, hob, lob):
         return (lob << 8) | hob
 
     # opcode -> instruction
@@ -141,28 +160,30 @@ class Cpu():
             
     # clear the display -- CLS/00E0
     def clearScreen_00E0(self):
-        print("implement clear screen")
+        self._monitor.clearDisplay()
 
     # return from a subroutine -- RET/00EE
     def returnSub_00EE(self):
-        self.programCounter = self.stack[self.stackPointer]
-        self.stackPointer -= 1
+        self.programCounter = self.popFromStack() # set PC to popped
 
-    # jumps to a machine code routine at address nnn
+    # jumps to a machine code routine at address nnn -> not commonly used
     def jump2MachineCodeRoutine_0nnn(self):
-        print("not implemented yet")
+        address = self.opCode & 0x0FFF # extract lower 12 bits
+        self.programCounter = address # set program counter to the address
 
     # jump to address nnn -- JP addr/1nnn
     def jumpAddr_1nnn(self):
         address = self.opCode & 0x0FFF  # extract lower 12 bits
-        self.programCounter = address   # set program counter to the address
-
+    
+        self.programCounter = address # set program counter to the address
+        
     # call a subroutine at nnn -- CALL addr/2nnn
     def callAddr_2nnn(self):
+        # push to stack
+        self.pushToStack(self.programCounter)
+
         address = self.opCode & 0x0FFF  # extract lower 12 bits
-        self.stackPointer += 1
-        self.stack[self.stackPointer] = self.programCounter
-        self.programCounter = address
+        self.programCounter = address # update pc to nibble
 
     # skip the next instruction if Vx == kk
     def skipNextInstruction_3xkk(self):
@@ -171,7 +192,8 @@ class Cpu():
         kk = self.opCode & 0x00FF    # grab last byte by masking -> No need to shift 
 
         if(self.registers[Vx] == kk):
-            self.incrementPC()
+            if (self.opCode & 0xF000) != 0x1000 and (self.opCode & 0xF000) != 0x2000:  # Not a JP or CALL instruction
+                self.incrementPC()
 
     # skip the next instruction if Vx != kk
     def skipNextInstruction_4xkk(self):
@@ -205,7 +227,7 @@ class Cpu():
         Vx = (self.opCode & 0x0F00) >> 8    # mask x and shift bits
         kk = self.opCode & 0x00FF    # grab last byte by masking
 
-        self.registers[Vx] += kk
+        self.registers[Vx] = (self.registers[Vx] + kk) & 0xFF # Wrap Byte
 
     # set the register Vx = Vy
     def setRegisterVx_8xy0(self):
@@ -264,46 +286,47 @@ class Cpu():
             self.registers[0xF] = 0 # VF Takes 0
 
         # Vy subtracted and stored in Vx
-        self.registers[Vx] -= self.registers[Vy]
+        self.registers[Vx] = (self.registers[Vx] - self.registers[Vy]) & 0xFF # Wrap Byte
 
     # set the register Vx = Vx SHR 1
     def setRegisterVx_8xy6(self):
         Vx = (self.opCode & 0x0F00) >> 8 # mask x and shift bits
 
         # check if LSB is 1
-        if(self.registers[Vx] & 0x1 == 1):
+        if(self.registers[Vx] & 0x1 != 0):
             self.registers[0xF] = 1 # VF Set to 1
         else:
             self.registers[0xF] = 0 # VF Set to 0
 
         # Vx shifted right by 1 AKA divided by two
-        self.registers[Vx] >>= 1
+        self.registers[Vx] = (self.registers[Vx] >> 1) & 0xFF # Wrap Byte
 
     # set the register Vx = Vy - Vx, and set VF = NOT borrow
     def setRegisterVx_8xy7(self):
         Vx = (self.opCode & 0x0F00) >> 8 # mask x and shift bits
         Vy = (self.opCode & 0x00F0) >> 4 # mask y and shift bits
 
+        
         if(self.registers[Vy] > self.registers[Vx]):
             self.registers[0xF] = 1 # VF Set to 1
         else:
             self.registers[0xF] = 0 # VF Set to 0
         
         # Vx subtracted FROM Vy and Stored in Vx
-        self.registers[Vx] = self.registers[Vy] - self.registers[Vx]
+        self.registers[Vx] = (self.registers[Vy] - self.registers[Vx]) & 0xFF  # Wrap Byte
 
     # set the register Vx = Vx SHL 1
     def setRegisterVx_8xyE(self):
         Vx = (self.opCode & 0x0F00) >> 8 # mask x and shift bits
 
         # check if MSB is 1
-        if(self.registers[Vx] & 0x80 == 1):
+        if(self.registers[Vx] & 0x80 != 0):
             self.registers[0xF] = 1 # VF Set to 1
         else:
             self.registers[0xF] = 0 # VF Set to 0
 
         # Vx shifted left by 1 AKA multiplied by two
-        self.registers[Vx] <<= 1
+        self.registers[Vx] = (self.registers[Vx] << 1) & 0xFF # Wrap Byte
 
     # skip the next instruction if Vx != Vy
     def skipNextInstruction_9xy0(self):
@@ -331,11 +354,32 @@ class Cpu():
 
     # set the register Vx = random byte AND kk.
     def setRegisterVx_Cxkk(self):
-        print("test...") # develop randomizer
+        Vx = self.opCode & 0x0F00 >> 8 # mask x and shift bits
+        kk = self.opCode & 0x00FF # mask last byte
 
-    # display sprite starting at memory location I
+        # set Vx to random byte AND kk
+        self.registers[Vx] = random.randint(0,255) & kk
+        
+
+    # display sprite starting at (Vx, Vy), set VF = collision.
     def displaySprite_Dxyn(self):
-        print("Implement Monitor")
+        Vx = (self.opCode & 0x0F00) >> 8 # mask x and shift bits -> x coordinate register
+        Vy = (self.opCode & 0x00F0) >> 4 # mask y and shift bits -> y coordinate register
+        nBit = self.opCode & 0x000F # mask n dont shift already at end -> num of bytes to read
+
+        x = self.registers[Vx] # get x coordinate value
+        y = self.registers[Vy] # get y coordinate value
+
+        # read in sprite(s) from memory
+        sprite = []
+        for i in range(nBit):
+            sprite.append(self._memory.getFromMemory(self.indexRegister + i)) # index register set earlier to be the first byte of the sprite in memory
+
+        # Call monitor's displaySprite method
+        isCollision = self._monitor.displaySprite(x, y, sprite, nBit)
+
+        # update VF register with collision status
+        self.registers[0xF] = isCollision
 
     # skip the next instruction if a key with the value of Vx is pressed
     def skipNextInstruction_Ex9E(self):
@@ -350,7 +394,7 @@ class Cpu():
         Vx = (self.opCode & 0x0F00) >> 8 # Mask x and shift bits
 
         # place DT Value into Vx
-        self.register[Vx] = self.delayTimer
+        self.registers[Vx] = self.delayTimer
 
     # wait for a key press and store the value of the key in the register Vx
     def waitForKeyPress_Fx0A(self):
@@ -379,7 +423,11 @@ class Cpu():
 
     # set the register I = location of a sprite for digit Vx
     def setRegisterI_Fx29(self):
-        print("Implement some talk to memory sprites")
+        Vx = (self.opCode & 0x0F00) >> 8 # Mask x and shift bits
+
+        digit = self.registers[Vx] # get digit value
+
+        self.indexRegister = digit * 5 # each byte is stored in the memory starting at itself * 5
 
     # store a BCD representation of Vx in memory
     def storeBCDRepresentationInMemory_Fx33(self):
@@ -400,16 +448,14 @@ class Cpu():
     def storeRegistersInMemory_Fx55(self):
         Vx = (self.opCode & 0x0F00) >> 8  # Mask x and shift bits
 
-        # iterate through registers V0 to Vx
-        for i in range(self.registers[Vx] + 1):
+        for i in range(Vx + 1): # Iterate up to and including Vx
             # store Register Value into Memory Starting at Index Register
-            self.memory.addToMemory(self.indexRegister + i, self.registers[i])
+            self._memory.addToMemory(self.indexRegister + i, self.registers[i])
 
     # read registers from memory
     def readRegisters_Fx65(self):
         Vx = (self.opCode & 0x0F00) >> 8  # Mask x and shift bits
 
-        # iterate through Registers
-        for i in range(self.registers[Vx] + 1):
+        for i in range(Vx + 1): # Iterate up to and including Vx
             # Add from Memory Starting at Index Register
             self.registers[i] = self._memory.getFromMemory(self.indexRegister + i)

@@ -12,5 +12,3 @@ def main():
 # call main to start the chip-8
 if __name__ == "__main__":
     main()
-
-    

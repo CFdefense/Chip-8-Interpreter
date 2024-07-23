@@ -17,3 +17,9 @@ class Keyboard():
             0x8: 'a', 0x9: 's', 0xA: 'd', 0xB: 'f',
             0xC: 'z', 0xD: 'x', 0xE: 'c', 0xF: 'v'
         }
+
+    #skipNextInstruction_ExA1
+
+    #skipNextInstruction_Ex9E
+
+    #waitForKeyPress_Fx0A
