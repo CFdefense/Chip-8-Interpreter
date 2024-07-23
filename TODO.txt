@@ -11,6 +11,7 @@ however pygame is installed in .venv -> now that I look the .venv folder is not 
 
 Let me know what you are able to do so I can continue from there tmrw <3
 
+ALSO Merge this branch and start a new one for ur changes cause cpu steps is done
 
 
 
