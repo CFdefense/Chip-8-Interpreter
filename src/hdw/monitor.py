@@ -1,11 +1,13 @@
-# Chip-8 Uses a 64x32 Monochrome (Black or White) Display
+# monitor.py
+# chip-8 uses a 64x32 monochrome (black or white) display
 
 
 import pygame # For Monitor Rendering -> Maybe Change if Using Website
 
-# Monitor Class
+# monitor
 class Monitor():
 
+    # chip-8 monitor constructor
     def __init__(self):
         print("Monitor was successfully created")
         self.width = 64
@@ -16,17 +18,17 @@ class Monitor():
         self.window = pygame.display.set_mode((self.width * self.scale, self.height * self.scale))
         pygame.display.set_caption("Chip-8 Emulator")
 
-    # Method to update display render whenever we modify the display
+    # update display render whenever we modify the display
     def updateRender(self):
         self.window.fill((0,0,0)) # wipe the screen
         for x in range(self.width): # for each y
             for y in range(self.height): # for each x
                 if self.display[x + (y * self.width)] == 1:  # if it is active
-                    # Draw white rectangle
+                    # draw white rectangle
                     pygame.draw.rect(self.window, (255, 255, 255), (x * self.scale, y * self.scale, self.scale, self.scale))
         pygame.display.flip() # update display
 
-    # Method to check if window is closed
+    # check if window is closed
     def handleEvents(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -34,13 +36,13 @@ class Monitor():
                 pygame.quit()
                 exit()
 
-    # Method to act on clearScreen_00E0 instruction
+    # act on clearScreen_00E0 instruction
     def clearDisplay(self):
         for i in range(len(self.display)):
             self.display[i] = 0
         self.updateRender()  # Update the display rendering after clearing
 
-    # Method to act on displaySprite_Dxyn instruction
+    # act on displaySprite_Dxyn instruction
     def displaySprite(self, x, y, spriteList, numbytes):
         isCollision = 0 # our collision flag to be returned and updated by cpu
         for n in range(numbytes): # for number of bytes
