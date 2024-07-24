@@ -37,7 +37,8 @@ class System():
         
         # some type of while loop to continuously call cycle
         while not (self.systemHalted):
-            self._keyboard.checkForEvents() # continuosly check for keyboard input
+            self._monitor.handleEvents() # to handle window events -> prevents freezing and need to force quit
+            self._keyboard.checkKeyboardEvents() # continuosly check for keyboard input
             
             # check if the user halts the system -- this would be through the keyboard
             if(self._keyboard.endProgram):
@@ -51,7 +52,7 @@ class System():
             if(delayTime > self.cycleDuration):
                 lastCycleTime = currentTime # update the last cycle
                 self._cpu.cycle() # start the cpu cycle
-                self._monitor.handleEvents() # to handle window events -> prevents freezing and need to force quit
+                
             
         print("The System is powering down...")
         exit()
@@ -59,4 +60,3 @@ class System():
     # calls memory and passes it the name of the ROM to load in
     def loadROM(self, fileName):
         self._memory.loadProgramIntoMemory(fileName)
-        # uncomment to dump memory -- self._memory.dumpMemory(512, 800)

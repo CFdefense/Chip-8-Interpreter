@@ -383,11 +383,23 @@ class Cpu():
 
     # skip the next instruction if a key with the value of Vx is pressed
     def skipNextInstruction_Ex9E(self):
-        print("Implement Keyboard")
+        Vx = (self.opCode & 0x0F00) >> 8 # Mask x and shift bits
+
+        key = self.registers[Vx] # get key value from register
+
+        # Skip the next instruction if the key is pressed
+        if(self._keyboard.checkKey(key)):
+            self.programCounter += 2  
 
     # skip the next instruction if a key with the value of Vx is not pressed
     def skipNextInstruction_ExA1(self):
-        print("Implement Keyboard")
+        Vx = (self.opCode & 0x0F00) >> 8 # Mask x and shift bits
+
+        key = self.registers[Vx] # get key value from register
+
+        # Skip the next instruction if the key is not pressed
+        if not (self._keyboard.checkKey(key)):
+            self.programCounter += 2
 
     # set the register Vx = delay timer
     def setRegisterVx_Fx07(self):
@@ -398,7 +410,14 @@ class Cpu():
 
     # wait for a key press and store the value of the key in the register Vx
     def waitForKeyPress_Fx0A(self):
-        print("Implement Keyboard")
+        Vx = (self.opCode & 0x0F00) >> 8  # Mask x and shift bits
+        pressedKey = None
+
+        # Wait for a key press
+        while (pressedKey == None):
+            pressedKey = self._keyboard.waitForKeyPress()
+
+        self.registers[Vx] = pressedKey  # Store the pressed key value in register Vx
 
     # set the delay timer = Vx
     def setDelayTimer_Fx15(self):
