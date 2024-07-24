@@ -9,7 +9,7 @@ class Monitor():
 
     # chip-8 monitor constructor
     def __init__(self):
-        print("Monitor was successfully created")
+        print("Monitor was successfully created...")
         self.width = 64
         self.height = 32
         self.scale = 10 # can be adjusted

@@ -15,7 +15,12 @@ ALSO Merge this branch and start a new one for ur changes cause cpu steps is don
 
 
 
-
+---------------
+merged branches.
+created new branch
+havent had time to test
+built out some of keyboard and implemented keyboard functionality in System
+check some of the comments in keyboard -- not sure about while true loop?
 
 
 local web server with python -- python3 - m http.server -- should we do this? -> will need to abandon pygame if we do this

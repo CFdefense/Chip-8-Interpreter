@@ -37,10 +37,12 @@ class System():
         
         # some type of while loop to continuously call cycle
         while not (self.systemHalted):
+            self._keyboard.checkForEvents() # continuosly check for keyboard input
+            
             # check if the user halts the system -- this would be through the keyboard
-            # if(self._keyboard):
-                #self.systemHalted = True
-                #break
+            if(self._keyboard.endProgram):
+                self.systemHalted = True
+                break
         
             currentTime = time.time()
             delayTime = currentTime - lastCycleTime
