@@ -15,10 +15,10 @@ class Keyboard():
         self.endProgram = False   # keeps track of user ending the program
         self.keyboard = bytearray(16) # keeps track of our key status'
         self.keyMap = { # python dictionary to map key hex indices to the chip-8 keypad layout
-            0x1: pygame.K_1, 0x2: pygame.K_2, 0x3: pygame.K_3, 0xC: pygame.K_c, 
-            0x4: pygame.K_4, 0x5: pygame.K_5, 0x6: pygame.K_6, 0xD: pygame.K_d, 
-            0x7: pygame.K_7, 0x8: pygame.K_8, 0x9: pygame.K_9, 0xE: pygame.K_e, 
-            0xA: pygame.K_a, 0x0: pygame.K_0, 0xB: pygame.K_b, 0xF: pygame.K_f
+            pygame.K_0: 0x0, pygame.K_1: 0x1, pygame.K_2: 0x2, pygame.K_3: 0x3,
+            pygame.K_4: 0x4, pygame.K_5: 0x5, pygame.K_6: 0x6, pygame.K_7: 0x7,
+            pygame.K_8: 0x8, pygame.K_9: 0x9, pygame.K_a: 0xA, pygame.K_b: 0xB,
+            pygame.K_c: 0xC, pygame.K_d: 0xD, pygame.K_e: 0xE, pygame.K_f: 0xF,
         }
 
     # return the pressed key
@@ -45,14 +45,16 @@ class Keyboard():
         for event in pygame.event.get():
             # if the event is keyboard down input
             if event.type == pygame.KEYDOWN:
-                print("Key down:" + event.key)
+                print("Key down:" + str(event.key))
                 chip8Key = self.keyMap.get(event.key)
-                        print("Chip-8 Key pressed " + chip8Key)
+                print("Chip-8 Key pressed " + str(chip8Key))
+                if chip8Key:
+                    self.keyboard[chip8Key] = 1
             # if the event is a keyboard up input
             elif event.type == pygame.KEYUP:
-                if event.key in self.keyMap.values():
-                    self.keyPressed = None
-                    print("Key released")
+                chip8Key = self.keyMap.get(event.key)
+                if chip8Key:
+                    self.keyboard[chip8Key] = 0
 
 
     # reset the keys pressed to make sure loops function properly
@@ -61,4 +63,7 @@ class Keyboard():
 
     # Method to take in a key value and return its state
     def checkKey(self, keyValue):
-        return self.keyPressed == keyValue
+        return self.keyboard[keyValue]
+    
+    def updateKey(self, keyValue, status):
+        self.keyboard[keyValue] = status

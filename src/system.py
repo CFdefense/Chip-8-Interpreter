@@ -17,7 +17,7 @@ class System():
         self._keyboard = Keyboard() # the systems keyboard 
         self._monitor = Monitor() # the systems monitor
         self._cpu = Cpu(self._memory, self._monitor, self._keyboard) # the systems cpu
-        self.cycleDuration = 1 / 60 # calculate 60hz
+        self.cycleDuration = 1 / 120 # calculate 60hz
         self.systemHalted = False
 
     # starts the entire system

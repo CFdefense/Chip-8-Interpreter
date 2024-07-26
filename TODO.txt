@@ -29,6 +29,7 @@ HOWEVER there are some issues im sure you will immediately see when you run keyt
 3. 3rd test of keytest ie wait instruction needs fixing to include DT
 I believe some of these may be errors due to me incorrectly setting up the keyboard methods
 OR due to our cycle not being correct -> maybe why we see delay
+4. ALSO Try to fix some error with flags test I fixed a few but there remains some which could interfer with our further tests
 
 
 

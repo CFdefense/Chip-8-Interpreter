@@ -36,11 +36,17 @@ class Cpu():
 
         # decrement the sound timer by 1 while its greater than 0
         if(self.soundTimer > 0):
+            if(self.soundTimer == 1):
+                self.beep()
             self.soundTimer -= 1
 
     # increments the program counter by 2 for the next instruction
     def incrementPC(self):
         self.programCounter += 2    # increment after execute
+    
+    # temp method for sound timer
+    def beep():
+        print("beep")
 
     def pushToStack(self, value):
         if self.stackPointer >= len(self.stack):
@@ -281,28 +287,32 @@ class Cpu():
         Vx = (self.opCode & 0x0F00) >> 8 # mask x and shift bits
         Vy = (self.opCode & 0x00F0) >> 4 # mask y and shift bits
 
+        # mask and store lowest byte
+        value = self.registers[Vx] + self.registers[Vy]
+        self.registers[Vx] = value & 0xFF
+
         # check if > 255
-        if(self.registers[Vx] + self.registers[Vy] > 0xFF):
+        if(value > 0xFF):
             self.registers[0xF] = 1 # VF Takes 1
         else:
             self.registers[0xF] = 0 # VF Takes 0
 
-        # mask and store lowest byte
-        self.registers[Vx] = (self.registers[Vx] + self.registers[Vy]) & 0xFF
         self.incrementPC()  # increment the program counter
 
     # set the register Vx = Vx - Vy, and set VF = NOT borrow
     def setRegisterVx_8xy5(self):
         Vx = (self.opCode & 0x0F00) >> 8 # mask x and shift bits
         Vy = (self.opCode & 0x00F0) >> 4 # mask y and shift bits
+        
+        # Vy subtracted and stored in Vx
+        value = self.registers[Vx] - self.registers[Vy]
+        self.registers[Vx] = value & 0xFF # Wrap Byte
 
-        if(self.registers[Vx] > self.registers[Vy]):
+        if(value > 0):
             self.registers[0xF] = 1 # VF Takes 1
         else:
             self.registers[0xF] = 0 # VF Takes 0
 
-        # Vy subtracted and stored in Vx
-        self.registers[Vx] = (self.registers[Vx] - self.registers[Vy]) & 0xFF # Wrap Byte
         self.incrementPC()  # increment the program counter
 
     # set the register Vx = Vx SHR 1
@@ -324,14 +334,15 @@ class Cpu():
         Vx = (self.opCode & 0x0F00) >> 8 # mask x and shift bits
         Vy = (self.opCode & 0x00F0) >> 4 # mask y and shift bits
 
+        # Vx subtracted and stored in Vx
+        value = self.registers[Vy] - self.registers[Vx]
+        self.registers[Vx] = value & 0xFF # Wrap Byte
         
-        if(self.registers[Vy] > self.registers[Vx]):
+        if(value > 0):
             self.registers[0xF] = 1 # VF Set to 1
         else:
             self.registers[0xF] = 0 # VF Set to 0
         
-        # Vx subtracted FROM Vy and Stored in Vx
-        self.registers[Vx] = (self.registers[Vy] - self.registers[Vx]) & 0xFF  # Wrap Byte
         self.incrementPC()  # increment the program counter
 
     # set the register Vx = Vx SHL 1
@@ -440,6 +451,7 @@ class Cpu():
 
         # place DT Value into Vx
         self.registers[Vx] = self.delayTimer
+        self.incrementPC()  # increment the program counter
 
     # wait for a key press and store the value of the key in the register Vx
     def waitForKeyPress_Fx0A(self):
