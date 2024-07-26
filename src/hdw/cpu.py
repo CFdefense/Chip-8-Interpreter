@@ -59,7 +59,6 @@ class Cpu():
     # step through each instruction
     def step(self):
         self.opCode = self.fetch()  # call fetch
-        self.incrementPC()  # increment the program counter
         self.instruction = self.decode()    # call decode
         self.execute()  # call execute
 
@@ -161,6 +160,7 @@ class Cpu():
     # clear the display -- CLS/00E0
     def clearScreen_00E0(self):
         self._monitor.clearDisplay()
+        self.incrementPC()  # increment the program counter
 
     # return from a subroutine -- RET/00EE
     def returnSub_00EE(self):
@@ -180,8 +180,8 @@ class Cpu():
     # call a subroutine at nnn -- CALL addr/2nnn
     def callAddr_2nnn(self):
         # push to stack
+        self.incrementPC()  # increment the program counter
         self.pushToStack(self.programCounter)
-
         address = self.opCode & 0x0FFF  # extract lower 12 bits
         self.programCounter = address # update pc to nibble
 
@@ -192,8 +192,11 @@ class Cpu():
         kk = self.opCode & 0x00FF    # grab last byte by masking -> No need to shift 
 
         if(self.registers[Vx] == kk):
-            if (self.opCode & 0xF000) != 0x1000 and (self.opCode & 0xF000) != 0x2000:  # Not a JP or CALL instruction
-                self.incrementPC()
+            self.incrementPC()
+            self.incrementPC()  # increment the program counter twice to skip 
+        else:
+            self.incrementPC()  # increment the program counter once
+        
 
     # skip the next instruction if Vx != kk
     def skipNextInstruction_4xkk(self):
@@ -203,6 +206,9 @@ class Cpu():
 
         if(self.registers[Vx] != kk):
             self.incrementPC()
+            self.incrementPC()  # increment the program counter twice
+        else:
+            self.incrementPC()  # increment the program counter once
 
     # skip the next instruction if Vx == Vy
     def skipNextInstruction_5xy0(self):
@@ -212,6 +218,9 @@ class Cpu():
 
         if(self.registers[Vx] == self.registers[Vy]):
             self.incrementPC()
+            self.incrementPC()  # increment the program counter twice
+        else:
+            self.incrementPC()  # increment the program counter once
 
     # set the register Vx = kk
     def setRegisterVx_6xkk(self):
@@ -220,6 +229,7 @@ class Cpu():
         kk = self.opCode & 0x00FF    # grab last byte by masking
 
         self.registers[Vx] = kk
+        self.incrementPC()  # increment the program counter
 
     # set the register Vx = Vx + kk
     def setRegisterVx_7xkk(self):
@@ -228,6 +238,7 @@ class Cpu():
         kk = self.opCode & 0x00FF    # grab last byte by masking
 
         self.registers[Vx] = (self.registers[Vx] + kk) & 0xFF # Wrap Byte
+        self.incrementPC()  # increment the program counter
 
     # set the register Vx = Vy
     def setRegisterVx_8xy0(self):
@@ -236,6 +247,7 @@ class Cpu():
         Vy = (self.opCode & 0x00F0) >> 4     # mask y and shift bits
 
         self.registers[Vx] = self.registers[Vy]
+        self.incrementPC()  # increment the program counter
 
     # set the register Vx = Vx OR Vy
     def setRegisterVx_8xy1(self):
@@ -244,6 +256,7 @@ class Cpu():
 
         # perform and store OR on Vx and Vy
         self.registers[Vx] |= self.registers[Vy]
+        self.incrementPC()  # increment the program counter
 
     # set the register Vx = Vx AND Vy
     def setRegisterVx_8xy2(self):
@@ -252,6 +265,7 @@ class Cpu():
 
         # perform and store AND on Vx and Vy
         self.registers[Vx] &= self.registers[Vy]
+        self.incrementPC()  # increment the program counter
 
     # set the register Vx = Vx XOR Vy
     def setRegisterVx_8xy3(self):
@@ -260,6 +274,7 @@ class Cpu():
 
         # perform and store XOR on Vx and Vy
         self.registers[Vx] ^= self.registers[Vy]
+        self.incrementPC()  # increment the program counter
 
     # set the register Vx = Vx + Vy, and set VF = carry
     def setRegisterVx_8xy4(self):
@@ -274,6 +289,7 @@ class Cpu():
 
         # mask and store lowest byte
         self.registers[Vx] = (self.registers[Vx] + self.registers[Vy]) & 0xFF
+        self.incrementPC()  # increment the program counter
 
     # set the register Vx = Vx - Vy, and set VF = NOT borrow
     def setRegisterVx_8xy5(self):
@@ -287,6 +303,7 @@ class Cpu():
 
         # Vy subtracted and stored in Vx
         self.registers[Vx] = (self.registers[Vx] - self.registers[Vy]) & 0xFF # Wrap Byte
+        self.incrementPC()  # increment the program counter
 
     # set the register Vx = Vx SHR 1
     def setRegisterVx_8xy6(self):
@@ -300,6 +317,7 @@ class Cpu():
 
         # Vx shifted right by 1 AKA divided by two
         self.registers[Vx] = (self.registers[Vx] >> 1) & 0xFF # Wrap Byte
+        self.incrementPC()  # increment the program counter
 
     # set the register Vx = Vy - Vx, and set VF = NOT borrow
     def setRegisterVx_8xy7(self):
@@ -314,6 +332,7 @@ class Cpu():
         
         # Vx subtracted FROM Vy and Stored in Vx
         self.registers[Vx] = (self.registers[Vy] - self.registers[Vx]) & 0xFF  # Wrap Byte
+        self.incrementPC()  # increment the program counter
 
     # set the register Vx = Vx SHL 1
     def setRegisterVx_8xyE(self):
@@ -327,6 +346,7 @@ class Cpu():
 
         # Vx shifted left by 1 AKA multiplied by two
         self.registers[Vx] = (self.registers[Vx] << 1) & 0xFF # Wrap Byte
+        self.incrementPC()  # increment the program counter
 
     # skip the next instruction if Vx != Vy
     def skipNextInstruction_9xy0(self):
@@ -336,6 +356,9 @@ class Cpu():
         # if they are not equal PC += 2
         if(self.registers[Vx] != self.registers[Vy]):
             self.incrementPC()
+            self.incrementPC()  # increment the program counter twice
+        else:
+            self.incrementPC()  # increment the program counter once
 
     # set the register I = nnn
     def setRegisterI_Annn(self):
@@ -343,6 +366,7 @@ class Cpu():
 
         # nnn stored in index register
         self.indexRegister = nnn
+        self.incrementPC()  # increment the program counter
 
     # jump to location nnn + V0
     def jump2Location_Bnnn(self):
@@ -359,6 +383,7 @@ class Cpu():
 
         # set Vx to random byte AND kk
         self.registers[Vx] = random.randint(0,255) & kk
+        self.incrementPC()  # increment the program counter
         
 
     # display sprite starting at (Vx, Vy), set VF = collision.
@@ -381,6 +406,8 @@ class Cpu():
         # update VF register with collision status
         self.registers[0xF] = isCollision
 
+        self.incrementPC()  # increment the program counter
+
     # skip the next instruction if a key with the value of Vx is pressed
     def skipNextInstruction_Ex9E(self):
         Vx = (self.opCode & 0x0F00) >> 8 # Mask x and shift bits
@@ -389,7 +416,10 @@ class Cpu():
 
         # Skip the next instruction if the key is pressed
         if(self._keyboard.checkKey(key)):
-            self.programCounter += 2  
+            self.incrementPC()
+            self.incrementPC()  # increment the program counter twice
+        else:
+            self.incrementPC()  # increment the program counter once
 
     # skip the next instruction if a key with the value of Vx is not pressed
     def skipNextInstruction_ExA1(self):
@@ -399,7 +429,10 @@ class Cpu():
 
         # Skip the next instruction if the key is not pressed
         if not (self._keyboard.checkKey(key)):
-            self.programCounter += 2
+            self.incrementPC()
+            self.incrementPC()  # increment the program counter twice
+        else:
+            self.incrementPC()  # increment the program counter once
 
     # set the register Vx = delay timer
     def setRegisterVx_Fx07(self):
@@ -411,13 +444,11 @@ class Cpu():
     # wait for a key press and store the value of the key in the register Vx
     def waitForKeyPress_Fx0A(self):
         Vx = (self.opCode & 0x0F00) >> 8  # Mask x and shift bits
-        pressedKey = None
-
-        # Wait for a key press
-        while (pressedKey == None):
-            pressedKey = self._keyboard.waitForKeyPress()
+        pressedKey = self._keyboard.waitForKeyPress()
+        self._keyboard.updateKey(pressedKey, True)
 
         self.registers[Vx] = pressedKey  # Store the pressed key value in register Vx
+        self.incrementPC()  # increment the program counter
 
     # set the delay timer = Vx
     def setDelayTimer_Fx15(self):
@@ -425,6 +456,7 @@ class Cpu():
 
         # set timer equal to Vx
         self.delayTimer = self.registers[Vx]
+        self.incrementPC()  # increment the program counter
 
     # set the sound timer = Vx
     def setSoundTimer_Fx18(self):
@@ -432,6 +464,7 @@ class Cpu():
 
         # set timer equal to Vx
         self.soundTimer = self.registers[Vx]
+        self.incrementPC()  # increment the program counter
 
     # set the register I = I + Vx
     def setRegisterI_Fx1E(self):
@@ -439,6 +472,7 @@ class Cpu():
 
         # set Index to index add Vx
         self.indexRegister += self.registers[Vx]
+        self.incrementPC()  # increment the program counter
 
     # set the register I = location of a sprite for digit Vx
     def setRegisterI_Fx29(self):
@@ -447,6 +481,7 @@ class Cpu():
         digit = self.registers[Vx] # get digit value
 
         self.indexRegister = digit * 5 # each byte is stored in the memory starting at itself * 5
+        self.incrementPC()  # increment the program counter
 
     # store a BCD representation of Vx in memory
     def storeBCDRepresentationInMemory_Fx33(self):
@@ -462,6 +497,7 @@ class Cpu():
         self._memory.addToMemory(self.indexRegister, hundredsPlace)
         self._memory.addToMemory(self.indexRegister + 1, tensPlace)
         self._memory.addToMemory(self.indexRegister + 2, onesPlace)
+        self.incrementPC()  # increment the program counter
 
     # store registers in memory
     def storeRegistersInMemory_Fx55(self):
@@ -470,6 +506,7 @@ class Cpu():
         for i in range(Vx + 1): # Iterate up to and including Vx
             # store Register Value into Memory Starting at Index Register
             self._memory.addToMemory(self.indexRegister + i, self.registers[i])
+        self.incrementPC()  # increment the program counter
 
     # read registers from memory
     def readRegisters_Fx65(self):
@@ -478,3 +515,4 @@ class Cpu():
         for i in range(Vx + 1): # Iterate up to and including Vx
             # Add from Memory Starting at Index Register
             self.registers[i] = self._memory.getFromMemory(self.indexRegister + i)
+        self.incrementPC()  # increment the program counter
