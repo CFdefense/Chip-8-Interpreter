@@ -1,6 +1,5 @@
 IMPORTANT 
-1. if youre having issues with pygame you need to pip install it (idk how on MAC so prob google)
-however pygame is installed in .venv -> now that I look the .venv folder is not pushing to git so you will probably have to pip install on ur MAC
+
 2. Test applications on your end such as test 1-3, BC test, both octojams, and test opcode
 3. SPACE_INVADERS Does not seem to want to boot -> many issues could cause this because the program is not built out so dont worry about it so much rn
 
