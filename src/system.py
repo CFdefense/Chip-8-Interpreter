@@ -37,8 +37,8 @@ class System():
         
         # some type of while loop to continuously call cycle
         while not (self.systemHalted):
-            self._monitor.handleEvents() # to handle window events -> prevents freezing and need to force quit
             self._keyboard.checkKeyboardEvents() # continuosly check for keyboard input
+            self._monitor.handleEvents() # to handle window events -> prevents freezing and need to force quit
             
             # check if the user halts the system -- this would be through the keyboard
             if(self._keyboard.endProgram):

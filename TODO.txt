@@ -12,13 +12,6 @@ Let me know what you are able to do so I can continue from there tmrw <3
 
 ALSO Merge this branch and start a new one for ur changes cause cpu steps is done
 
----------------
-merged branches.
-created new branch
-havent had time to test
-built out some of keyboard and implemented keyboard functionality in System
-check some of the comments in keyboard -- not sure about while true loop?
-
 ----------------
 Continued on your work with the keyboard
 I have successfully implemented cpu functions and the program recognizes the proper keys

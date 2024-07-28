@@ -84,7 +84,7 @@ class Cpu():
     
     # execute the correct operation based off of the current instruction
     def execute(self):
-        print(self.instruction, end= " ")
+        # print(self.instruction, end= " ")
 
         # determine the instruction to execute
         if(self.opCode & 0xF000 == 0x0000):
