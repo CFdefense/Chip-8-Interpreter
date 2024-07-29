@@ -303,15 +303,16 @@ class Cpu():
     def setRegisterVx_8xy5(self):
         Vx = (self.opCode & 0x0F00) >> 8 # mask x and shift bits
         Vy = (self.opCode & 0x00F0) >> 4 # mask y and shift bits
-        
+
         # Vy subtracted and stored in Vx
         value = self.registers[Vx] - self.registers[Vy]
         self.registers[Vx] = value & 0xFF # Wrap Byte
 
-        if(value > 0):
+        if(value >= 0):
             self.registers[0xF] = 1 # VF Takes 1
         else:
             self.registers[0xF] = 0 # VF Takes 0
+        
 
         self.incrementPC()  # increment the program counter
 
