@@ -26,8 +26,9 @@ class Keyboard():
         return self.keyPressed  # returns the pressed key
 
     # wait for keyboard input
-    def waitForKeyPress(self):  # would this be a while true loop to continuosly look until done????
+    def waitForKeyPress(self):
         pygame.event.set_allowed(pygame.KEYDOWN) # restrict event processing
+        pygame.event.clear()
         key = None # initialize flag
         
         # wait for keydown and find the associated key
@@ -42,10 +43,11 @@ class Keyboard():
 
     # continuosly check for keyboard input events
     def checkKeyboardEvents(self):
-        for event in pygame.event.get():
+        pygame.event.pump()
+        events = pygame.event.get()
+        for event in events:
             # if the event is keyboard down input
             if event.type == pygame.KEYDOWN:
-                print("Key down:" + str(event.key))
                 chip8Key = self.keyMap.get(event.key)
                 print("Chip-8 Key pressed " + str(chip8Key))
                 if chip8Key:
