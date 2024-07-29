@@ -339,7 +339,7 @@ class Cpu():
         value = self.registers[Vy] - self.registers[Vx]
         self.registers[Vx] = value & 0xFF # Wrap Byte
         
-        if(value > 0):
+        if(value >= 0):
             self.registers[0xF] = 1 # VF Set to 1
         else:
             self.registers[0xF] = 0 # VF Set to 0
