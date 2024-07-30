@@ -6,37 +6,46 @@
 
 -- could use key_pressed() method for pygame instead of events
 
+-- Will begin and log testing here -> FIX IMPLEMENTED
+1st Conclusion: python is dogshit and our unoptimized code is causing lagging due to overexecution
+    -> attempts at optimizing display did not improve efficiency checking system
+    ->Deleted sys halting, chip 8 halts on its on pausing the sys wont help because events would pause and we wouldnt be able to break out
+        -> Chip 8 should halt itself by use of timers/looping calls on pc or our own implementation
+        -> our code uses the final of these options to halt so no need to pause system
+    -> upon investigating sys I found the error YAY !!!
+        -> The problem was as I expected, our cycling. We were using our cycle of 1/60 incorrectly
+        -> The issue with our code pertained to two specific points -> delay timer and our sys rate
+        -> Upon researching into chip8's sys cycle I found that it is supposed to be solely RESTRICTED by the timers
+        -> Our previous implementation RESTRICTED our cycle rather than our timers
+        -> in addition we were miscalculting our system by not calling time on init but rather after the first pass
+        -> I tested this by removing the system cycling first from our system
+        -> from this I observed our system running very responsively, However it was TOO fast!
+        -> this was a big upgrade as too fast was way better than too slow
+        -> We still need our 1/60 hz restriction to keep in par with the systems specifications
+        -> I then applied the cycling restriction to the delay and sound timers. 
+        -> From this I observed our desired framerate AND correct delay of the timers ticking down at 1/60
+        -> this restricts some actions being taken by our registers and prevents the system from executing too fast
+        -> overall this was the small fix that was needed. I am observing some unresponsiveness with event.quit will look into that
+        -> I believe a good fix for this will be condensing our event checking methods into one
+            -> this seems to have fixed the issue except for crashing cases
+    
+    -- STILL BROKEN? --
+    -> overall still having issues with halt for keypad test due to our implementation not cycling back pc
+        -> this should be okay because it appears to halt? -> maybe not see danm8ku -> alot of games crashing due to this
+    -> Still two instructions throwing carry error
+        -> i think its fine 
+    -> Implement sound for beep?
+        -> done can change if needed
+    -> ALOT OF ROMS BROKEN IDK WHY
+        -> possible due to other incorrect implementation ie displaying sprites to fast/often
+        -> ex: space invaders works as intended however, why does character move so fast?
+        -> pumpkin dressup wont quit?
+        -> snake too fast
+        -> rock paper scizzors scripted -> randomize not working?
+    
 
-----------------
-
-IMPORTANT 
-
-2. Test applications on your end such as test 1-3, BC test, both octojams, and test opcode
-3. SPACE_INVADERS Does not seem to want to boot -> many issues could cause this because the program is not built out so dont worry about it so much rn
-
---TODO--
-1. cpu test (test 4? is this an issue?)
-2. Keyboard build and test (test 6) -> I am unsure how to log keypresses through pygame :?
-3. Sound build and test (test 7)
-
-Let me know what you are able to do so I can continue from there tmrw <3
-
-ALSO Merge this branch and start a new one for ur changes cause cpu steps is done
-
-----------------
-Continued on your work with the keyboard
-I have successfully implemented cpu functions and the program recognizes the proper keys
-HOWEVER there are some issues im sure you will immediately see when you run keytest
-1. Overwhelming Delay 
-2. Issues with keys being pressed simultaneously
-3. 3rd test of keytest ie wait instruction needs fixing to include DT
-I believe some of these may be errors due to me incorrectly setting up the keyboard methods
-OR due to our cycle not being correct -> maybe why we see delay
-4. ALSO Try to fix some error with flags test I fixed a few but there remains some which could interfer with our further tests
-5. I also modified hz for testing you can change if needed
-
-
-
-
-local web server with python -- python3 - m http.server -- should we do this? -> will need to abandon pygame if we do this
-
+    -- TODO --
+    Web Implementation?
+    Menu for Game Select?
+    Sound Select Option?
+    Hz Select Option?

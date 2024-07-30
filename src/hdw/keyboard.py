@@ -18,7 +18,7 @@ class Keyboard():
             pygame.K_1: 0x1, pygame.K_2: 0x2, pygame.K_3: 0x3, pygame.K_4: 0xC,
             pygame.K_q: 0x4, pygame.K_w: 0x5, pygame.K_e: 0x6, pygame.K_r: 0xD,
             pygame.K_a: 0x7, pygame.K_s: 0x8, pygame.K_d: 0x9, pygame.K_f: 0xE,
-            pygame.K_z: 0xA, pygame.K_x: 0x0, pygame.K_c: 0xB, pygame.K_v: 0xF
+            pygame.K_z: 0xA, pygame.K_x: 0x0, pygame.K_c: 0xB, pygame.K_v: 0xF,
         }
 
     # return the pressed key
@@ -32,9 +32,10 @@ class Keyboard():
         key = None # initialize flag
         
         # wait for keydown and find the associated key
-        while(key == None):
+        while key is None:
             event = pygame.event.wait()
-            key = self.keyMap.get(event.key)
+            if event.type == pygame.KEYDOWN:
+                key = self.keyMap.get(event.key)
 
         pygame.event.set_blocked(None) # reset event blocking
 
@@ -49,14 +50,18 @@ class Keyboard():
             # if the event is keyboard down input
             if event.type == pygame.KEYDOWN:
                 chip8Key = self.keyMap.get(event.key)
-                print("Chip-8 Key pressed " + str(chip8Key))
-                if chip8Key:
+                if chip8Key is not None:
                     self.keyboard[chip8Key] = 1
             # if the event is a keyboard up input
             elif event.type == pygame.KEYUP:
                 chip8Key = self.keyMap.get(event.key)
-                if chip8Key:
+                if chip8Key is not None:
                     self.keyboard[chip8Key] = 0
+            elif event.type == pygame.QUIT:
+                print("Display window closed")
+                pygame.quit()
+                exit()
+
 
 
     # reset the keys pressed to make sure loops function properly

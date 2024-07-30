@@ -6,16 +6,18 @@ from hdw.memory import Memory
 from hdw.monitor import Monitor
 from hdw.keyboard import Keyboard
 
-import random # for use in Cxkk instruction
+import random # for use in Cxkk instructio
+import time
 # cpu
 class Cpu():
 
     # chip-8 cpu constructor
-    def __init__(self, memory, monitor, keyboard):
+    def __init__(self, memory, monitor, keyboard, speaker):
         print("CPU was created successfully...")
         self._memory = memory   # pass in memory so the cpu is aware of it
         self._monitor = monitor
         self._keyboard = keyboard
+        self._speaker = speaker
         self.registers = bytearray(16)  # 16 8-bit registers
         self.stack = [0] * 16  # keeps track of subroutines and order of execution 16 bit
         self.programCounter = 0x200 # 16-bit program counter -- holds address of next instruction
@@ -25,28 +27,36 @@ class Cpu():
         self.soundTimer = 0 # this timer also decrements at a rate of 60Hz
         self.opCode = 0 # the current op code
         self.instruction = 0    # the current instruction
+        self.drawFlag = True
+        self.currTime = time.time()
 
     # cpu cycle
     def cycle(self):
         self.step() # step through each instruction
 
-        # decrement the delay timer by 1 until it is 0
-        if(self.delayTimer > 0):
-            self.delayTimer -= 1
+        pyTime = time.time() # get post step time
 
-        # decrement the sound timer by 1 while its greater than 0
-        if(self.soundTimer > 0):
-            if(self.soundTimer == 1):
-                self.beep()
-            self.soundTimer -= 1
+        # if enough time passed
+        if pyTime - self.currTime >= 1.0/60:
+            # decrement the delay timer by 1 until it is 0
+            if(self.delayTimer > 0):
+                self.delayTimer -= 1
+
+            # decrement the sound timer by 1 while its greater than 0
+            if(self.soundTimer > 0):
+                if(self.soundTimer == 1):
+                    self.beep()
+                self.soundTimer -= 1
+            
+            self.currTime = pyTime
 
     # increments the program counter by 2 for the next instruction
     def incrementPC(self):
         self.programCounter += 2    # increment after execute
     
     # temp method for sound timer
-    def beep():
-        print("beep")
+    def beep(self):
+        self._speaker.playSound()
 
     def pushToStack(self, value):
         if self.stackPointer >= len(self.stack):
@@ -84,7 +94,7 @@ class Cpu():
     
     # execute the correct operation based off of the current instruction
     def execute(self):
-        # print(self.instruction, end= " ")
+        #print(self.instruction, end= " ") for debug
 
         # determine the instruction to execute
         if(self.opCode & 0xF000 == 0x0000):
@@ -166,6 +176,7 @@ class Cpu():
     # clear the display -- CLS/00E0
     def clearScreen_00E0(self):
         self._monitor.clearDisplay()
+        self.drawFlag = True
         self.incrementPC()  # increment the program counter
 
     # return from a subroutine -- RET/00EE
@@ -419,6 +430,8 @@ class Cpu():
         self.registers[0xF] = isCollision
 
         self.incrementPC()  # increment the program counter
+
+        self.drawFlag = True
 
     # skip the next instruction if a key with the value of Vx is pressed
     def skipNextInstruction_Ex9E(self):

@@ -2,11 +2,11 @@
 # the entire system and the primary file for everything
 
 # imports here -- 
-import time
 from hdw.memory import Memory
 from hdw.cpu import Cpu
 from hdw.keyboard import Keyboard
 from hdw.monitor import Monitor
+from hdw.speaker import Speaker
 
 # system
 class System():
@@ -16,9 +16,8 @@ class System():
         self._memory = Memory() # the systems memory
         self._keyboard = Keyboard() # the systems keyboard 
         self._monitor = Monitor() # the systems monitor
-        self._cpu = Cpu(self._memory, self._monitor, self._keyboard) # the systems cpu
-        self.cycleDuration = 1 / 60 # calculate 60hz
-        self.systemHalted = False
+        self._speaker = Speaker() # the systems speaker
+        self._cpu = Cpu(self._memory, self._monitor, self._keyboard, self._speaker) # the systems cpu
 
     # starts the entire system
     def startSystem(self):
@@ -33,29 +32,16 @@ class System():
         except:
             print("There was an issue when attempting to load in the ROM...")
         
-        lastCycleTime = time.time() # get the current time
-        
         # some type of while loop to continuously call cycle
-        while not (self.systemHalted):
-            self._keyboard.checkKeyboardEvents() # continuosly check for keyboard input
-            self._monitor.handleEvents() # to handle window events -> prevents freezing and need to force quit
-            
-            # check if the user halts the system -- this would be through the keyboard
-            if(self._keyboard.endProgram):
-                self.systemHalted = True
-                break
-        
-            currentTime = time.time()
-            delayTime = currentTime - lastCycleTime
+        while True:
+            self._cpu.cycle() # start the cpu cycle
 
-            # check if enough time has passed between cycles
-            if(delayTime > self.cycleDuration):
-                lastCycleTime = currentTime # update the last cycle
-                self._cpu.cycle() # start the cpu cycle
-                
-            
-        print("The System is powering down...")
-        exit()
+            # update when necessary and outside of cycle for responsiveness
+            if(self._cpu.drawFlag):
+                self._monitor.updateRender()
+                self._cpu.drawFlag = False
+
+            self._keyboard.checkKeyboardEvents() # continously check for keyboard inputs
 
     # calls memory and passes it the name of the ROM to load in
     def loadROM(self, fileName):

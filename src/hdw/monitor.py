@@ -3,6 +3,7 @@
 
 
 import pygame # For Monitor Rendering -> Maybe Change if Using Website
+import numpy as np
 
 # monitor
 class Monitor():
@@ -28,19 +29,10 @@ class Monitor():
                     pygame.draw.rect(self.window, (255, 255, 255), (x * self.scale, y * self.scale, self.scale, self.scale))
         pygame.display.flip() # update display
 
-    # check if window is closed
-    def handleEvents(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                print("Display window closed")
-                pygame.quit()
-                exit()
-
     # act on clearScreen_00E0 instruction
     def clearDisplay(self):
         for i in range(len(self.display)):
             self.display[i] = 0
-        self.updateRender()  # Update the display rendering after clearing
 
     # act on displaySprite_Dxyn instruction
     def displaySprite(self, x, y, spriteList, numbytes):
@@ -53,7 +45,6 @@ class Monitor():
                     if self.display[drawIndex] == 1: # check for collision at index of pixel
                         isCollision = 1 # upd collision flag
                     self.display[drawIndex] ^= 1  # XOR index to update pixel
-        self.updateRender() # call method to update the display
 
         # return collision flag to be stored in VF
         return isCollision
