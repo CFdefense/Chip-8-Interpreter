@@ -14,6 +14,7 @@ This software draws inspiration and is an adaptation of works created by **Prof.
 - Austin Morlans building a Chip-8 emulator: [Austin Morlan](https://austinmorlan.com/posts/chip8_emulator/)
 
 For testing https://github.com/Timendus/chip8-test-suite?tab=readme-ov-file#chip-8-splash-screen
+
 For Viewing ROM Machine Code https://hexed.it/
 
 ## Execution
