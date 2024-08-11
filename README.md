@@ -15,3 +15,6 @@ This software draws inspiration and is an adaptation of works created by **Prof.
 
 For testing https://github.com/Timendus/chip8-test-suite?tab=readme-ov-file#chip-8-splash-screen
 For Viewing ROM Machine Code https://hexed.it/
+
+## Execution
+Installation of pygame may be required to run the interpreter. For more information follow the guide [here](https://www.pygame.org/wiki/GettingStarted) 
