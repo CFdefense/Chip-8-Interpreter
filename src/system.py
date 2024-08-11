@@ -7,7 +7,7 @@ from hdw.cpu import Cpu
 from hdw.keyboard import Keyboard
 from hdw.monitor import Monitor
 from hdw.speaker import Speaker
-
+from pygame import time
 # system
 class System():
 
@@ -34,6 +34,7 @@ class System():
         
         # some type of while loop to continuously call cycle
         while True:
+            time.wait(1)
             self._cpu.cycle() # start the cpu cycle
 
             # update when necessary and outside of cycle for responsiveness

@@ -1,51 +1,5 @@
-
--- fixed some op codes and keyboard issues
--- 2 are still failing but it might be because of the "quirks" part, but im unsure
-8xy6 - vX = vY >> 1 or vX = vX >> 1 depending on quirks
-8xyE - vX = vY << 1 or vX = vX << 1 depending on quirks
-
--- could use key_pressed() method for pygame instead of events
-
--- Will begin and log testing here -> FIX IMPLEMENTED
-1st Conclusion: python is dogshit and our unoptimized code is causing lagging due to overexecution
-    -> attempts at optimizing display did not improve efficiency checking system
-    ->Deleted sys halting, chip 8 halts on its on pausing the sys wont help because events would pause and we wouldnt be able to break out
-        -> Chip 8 should halt itself by use of timers/looping calls on pc or our own implementation
-        -> our code uses the final of these options to halt so no need to pause system
-    -> upon investigating sys I found the error YAY !!!
-        -> The problem was as I expected, our cycling. We were using our cycle of 1/60 incorrectly
-        -> The issue with our code pertained to two specific points -> delay timer and our sys rate
-        -> Upon researching into chip8's sys cycle I found that it is supposed to be solely RESTRICTED by the timers
-        -> Our previous implementation RESTRICTED our cycle rather than our timers
-        -> in addition we were miscalculting our system by not calling time on init but rather after the first pass
-        -> I tested this by removing the system cycling first from our system
-        -> from this I observed our system running very responsively, However it was TOO fast!
-        -> this was a big upgrade as too fast was way better than too slow
-        -> We still need our 1/60 hz restriction to keep in par with the systems specifications
-        -> I then applied the cycling restriction to the delay and sound timers. 
-        -> From this I observed our desired framerate AND correct delay of the timers ticking down at 1/60
-        -> this restricts some actions being taken by our registers and prevents the system from executing too fast
-        -> overall this was the small fix that was needed. I am observing some unresponsiveness with event.quit will look into that
-        -> I believe a good fix for this will be condensing our event checking methods into one
-            -> this seems to have fixed the issue except for crashing cases
-    
-    -- STILL BROKEN? --
-    -> overall still having issues with halt for keypad test due to our implementation not cycling back pc
-        -> this should be okay because it appears to halt? -> maybe not see danm8ku -> alot of games crashing due to this
-    -> Still two instructions throwing carry error
-        -> i think its fine 
-    -> Implement sound for beep?
-        -> done can change if needed
-    -> ALOT OF ROMS BROKEN IDK WHY
-        -> possible due to other incorrect implementation ie displaying sprites to fast/often
-        -> ex: space invaders works as intended however, why does character move so fast?
-        -> pumpkin dressup wont quit?
-        -> snake too fast
-        -> rock paper scizzors scripted -> randomize not working?
-    
-
-    -- TODO --
+-- TODO --
     Web Implementation?
+    Possible bug with randomization
     Menu for Game Select?
     Sound Select Option?
-    Hz Select Option?
