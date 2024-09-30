@@ -11,7 +11,7 @@ class Speaker():
     def __init__(self):
         print("Speaker was successfully created...")
         pygame.mixer.init() # init pygame use of sounds
-        self.soundEffect = pygame.mixer.Sound(os.path.join("sounds","699927__8bitmyketison__grunt-01-retro-lo-fi.wav"))
+        self.soundEffect = pygame.mixer.Sound(os.path.join("..", "sounds","699927__8bitmyketison__grunt-01-retro-lo-fi.wav"))
 
     # to play sound effect
     def playSound(self):
